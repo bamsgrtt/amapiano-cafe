@@ -1,58 +1,139 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎸 Amapiano Cafe & Resto - Online Reservation System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Amapiano Cafe Reservation System adalah aplikasi pemesanan meja restoran berbasis web interaktif. Dibangun menggunakan **Laravel 13**, **Tailwind CSS v4**, dan **Vanilla JavaScript (AJAX Fetch API)**, sistem ini dirancang dengan estetika premium bergaya *rustic-modern* dan dilengkapi sistem manajemen operasional yang canggih untuk memberikan pengalaman terbaik kepada pelanggan dan staf restoran.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🌟 Fitur Utama
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 1. Sisi Pelanggan (Customer Facing Page)
+* **Interactive Seating Floor Plan**: Denah meja interaktif 2D yang responsif secara *real-time* berbasis AJAX. Meja yang sudah dipesan pada waktu terpilih otomatis terkunci/dinonaktifkan (*disabled*).
+* **4-Step Booking Wizard**:
+  * **Langkah 1**: Memilih tanggal & waktu kedatangan (dengan batas waktu minimal reservasi H-1).
+  * **Langkah 2**: Memilih area kafe yang unik (*Hoof Barn*, *Covent Garden*, atau *VIP Lounge*).
+  * **Langkah 3**: Memilih nomor meja secara langsung melalui tata letak visual denah meja.
+  * **Langkah 4**: Mengisi data diri pelanggan dan ringkasan persetujuan aturan reservasi.
+* **Dynamic Ticket & QR Code**: Tiket sukses reservasi dengan kode unik (`AMP-XXXX`) yang dilengkapi QR Code dinamis langsung di browser untuk kemudahan proses *check-in*.
+* **Status Operasional Cafe**: Mengunci formulir booking dan memunculkan banner pemberitahuan eksklusif jika sistem reservasi ditutup oleh Admin.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 2. Dasbor Staff (Front Desk)
+* **Pencarian Pintar & Validasi**: Mencari dan memvalidasi tiket reservasi secara instan. Fitur ini secara otomatis menghapus simbol `#` jika staff menginputkannya (misal: `#AMP-8291` -> `AMP-8291`).
+* **Sistem Check-In**: Konfirmasi kehadiran pelanggan dengan satu klik yang mencatat waktu check-in (`checked_in_at`).
+* **Peringatan Keterlambatan**: Deteksi otomatis keterlambatan (>15 menit dari jadwal booking) dengan label peringatan berwarna kuning.
+* **Daftar Reservasi Masa Depan**: Menampilkan semua reservasi mendatang (mulai hari ini dan seterusnya) diurutkan berdasarkan jadwal terdekat untuk memudahkan perencanaan tempat.
 
-## Learning Laravel
+### 3. Dasbor Super Admin
+* **Dashboard Overview**: Ringkasan statistik bulanan, okupansi meja hari ini, estimasi pendapatan harian, dan grafik tren mingguan berbasis Chart.js.
+* **Direct Reservation Control**: Tombol tindakan cepat untuk mengubah status reservasi pelanggan menjadi *Checked-In* atau *Cancelled* langsung dari panel admin.
+* **Manajemen User**: Menambah dan menghapus akun Staff/Admin (dilengkapi pengaman pencegah penghapusan akun sendiri).
+* **Promo & Event**: Menambahkan dan menghapus kartu promo diskon atau live music event yang disimpan di dalam cache aplikasi.
+* **Operational Toggle**: Saklar operasional (*toggle switch*) sekali klik berbasis AJAX untuk membuka/menutup reservasi online secara *real-time* dengan menyimpan status ke Cache (`store_open`).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## 📐 Tata Letak & Kapasitas Meja
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Aplikasi ini mendukung **25 meja** yang terbagi ke dalam 3 area utama dengan kapasitas masing-masing:
 
-## Agentic Development
+| Area | ID Meja | Kapasitas Meja | Total Meja |
+|---|---|---|---|
+| **Hoof Barn** (Main Hall) | `hb-1` s.d `hb-8` | `hb-1`: 2 orang<br>`hb-2` & `hb-3`: 4 orang<br>`hb-4`: 6 orang<br>`hb-5`: 2 orang<br>`hb-6` & `hb-7`: 4 orang<br>`hb-8`: 6 orang | 8 Meja |
+| **Covent Garden** (Terrace) | `cg-1` s.d `cg-10` | `cg-1`: 2 orang<br>`cg-2` & `cg-3`: 4 orang<br>`cg-4`: 6 orang<br>`cg-5`: 2 orang<br>`cg-6` s.d `cg-9`: 4 orang<br>`cg-10`: 8 orang | 10 Meja |
+| **Limburg** (VIP Lounge) | `lb-1` s.d `lb-7` | `lb-1`: 2 orang<br>`lb-2` & `lb-3`: 4 orang<br>`lb-4`: 2 orang<br>`lb-5`: 6 orang<br>`lb-6` & `lb-7`: 4 orang | 7 Meja |
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+---
 
+## 🛠️ Spesifikasi Teknologi & Dependensi
+
+* **Backend**: PHP 8.3 & Laravel Framework 13
+* **Frontend**: HTML5, Vanilla JavaScript (AJAX Fetch API), Tailwind CSS v4
+* **Grafik & Ikon**: Chart.js & FontAwesome v6
+* **Database**: MySQL / MariaDB
+* **Testing & Formatting**: Pest PHP v4, PHPUnit v12, Laravel Pint
+* **Ecosystem Tools**: Laravel Boost v2, Laravel Pail v1, Laravel Pao v1
+
+---
+
+## 🚀 Panduan Instalasi & Menjalankan Proyek
+
+### 1. Klon Repositori
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/bamsgrtt/amapiano-cafe.git
+cd amapiano-cafe
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Pasang Dependensi Composer & NPM
+```bash
+composer install
+npm install
+```
 
-## Contributing
+### 3. Konfigurasi Environment Berkas `.env`
+Salin berkas konfigurasi default dan sesuaikan pengaturan database Anda:
+```bash
+copy .env.example .env
+```
+Sesuaikan parameter database di dalam `.env`:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=amapiano_cafe
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Setup Database & Jalankan Migrasi + Seeder
+Jalankan migrasi database beserta pengisian data pengujian awal (seeder):
+```bash
+php artisan migrate:fresh --seed
+```
 
-## Code of Conduct
+### 5. Kompilasi Aset CSS/JS Vite
+Jalankan server kompilasi Vite:
+```bash
+npm run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 6. Jalankan Aplikasi
+Mulai local development server Laravel:
+```bash
+php artisan serve
+```
+Akses aplikasi melalui browser di [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 🔑 Akun Kredensial Default (Uji Coba)
 
-## License
+Gunakan akun-akun berikut untuk masuk ke dasbor manajemen kafe setelah menjalankan seeder database:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+| Peran (Role) | Email | Sandi (Password) | URL Akses Halaman |
+|---|---|---|---|
+| **Super Admin** | `admin@amapiano.com` | `password` | `/admin/dashboard` |
+| **Front Desk Staff** | `staff@amapiano.com` | `password` | `/staff/dashboard` |
+| **Customer** | `test@example.com` | `password` | `/` |
+
+---
+
+## 🧪 Pengujian Otomatis (Automated Testing)
+
+Proyek ini telah dilengkapi dengan pengujian unit dan fitur komprehensif menggunakan **Pest PHP** untuk memvalidasi:
+- Alur login & pembatasan hak akses halaman berdasarkan peran (*Role-based Access Control*).
+- Sistem validasi check-in reservasi dan manipulasi simbol pencarian `#`.
+- Keamanan pendaftaran akun staff & proteksi penghapusan akun sendiri.
+- Penolakan pembuatan reservasi baru jika status toko ditutup.
+
+Jalankan perintah berikut untuk mengeksekusi semua tes:
+```bash
+php artisan test --compact
+```
+
+---
+
+## 🎨 Pemformatan Kode (Clean Code)
+
+Aplikasi ini menggunakan **Laravel Pint** untuk menjaga gaya penulisan kode PHP agar tetap bersih dan terstandardisasi. Format seluruh file PHP yang berubah menggunakan perintah:
+```bash
+vendor/bin/pint --dirty --format agent
+```
