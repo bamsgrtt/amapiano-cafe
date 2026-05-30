@@ -1,25 +1,37 @@
 <x-layouts.app title="Register - Amapiano Cafe">
     <div class="flex items-center justify-center min-h-[70vh] py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-lg bg-white/80 backdrop-blur-md rounded-3xl border border-[#E6E0D5] p-8 shadow-xl">
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-50 text-orange-600 mb-4">
-                    <i class="fa-regular fa-id-card text-xl"></i>
+        <div class="w-full max-w-4xl bg-white/80 backdrop-blur-md overflow-hidden rounded-3xl border border-[#E6E0D5] grid grid-cols-1 lg:grid-cols-2 shadow-xl">
+              <!-- KIRI: Bagian Gambar (Hanya muncul di layar komputer/laptop) -->
+            <div class="hidden lg:block relative min-h-[500px] rounded-l-3xl">
+                <img src="{{ asset('images/logo.jpg') }}"
+                     alt="Amapiano Cafe" 
+                     class="absolute inset-0 w-full h-full object-cover" />
+                <!-- Overlay gradasi warna hitam transparan agar gambar lebih menyatu -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-black/20 flex flex-col justify-end p-8 text-white">
+                    <h3 class="text-2xl font-serif mb-2">Amapiano Cafe</h3>
+                    <p class="text-sm opacity-80 font-light">Experience the perfect blend of rich coffee aroma and rhythmic vibes.</p>
                 </div>
-                <h2 class="text-3xl font-serif text-[#2B231D] tracking-tight">Create Account</h2>
-                <p class="text-sm text-[#7A7067] mt-2 font-light">
-                    Join Amapiano Cafe for faster reservations and exclusive offers.
-                </p>
             </div>
+            <!-- Header -->
+            <div class="p-8 sm:p-12 flex flex-col justify-center">
+                <div class="text-center mb-8">
+                    <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-50 text-orange-600 mb-4">
+                        <i class="fa-regular fa-id-card text-xl"></i>
+                    </div>
+                    <h2 class="text-3xl font-serif text-[#2B231D] tracking-tight">Buat Akun</h2>
+                    <p class="text-sm text-[#7A7067] mt-2 font-light">
+                        Join Amapiano Cafe for faster reservations and exclusive offers.
+                    </p>
+                </div>
 
-            <!-- Register Form -->
-            <form method="POST" action="{{ Route::has('register') ? route('register') : '#' }}" class="space-y-5">
-                @csrf
+                <!-- Register Form -->
+                <form method="POST" action="{{ Route::has('register') ? route('register') : '#' }}" class="space-y-5">
+                    @csrf
 
-                <!-- Name -->
-                <div class="space-y-1.5">
-                    <label for="name" class="block text-[11px] font-semibold text-[#7A7067] uppercase tracking-wider">Full Name</label>
-                    <div class="relative flex items-center">
+                    <!-- Name -->
+                    <div class="space-y-1.5">
+                        <label for="name" class="block text-[11px] font-semibold text-[#7A7067] uppercase tracking-wider">Full Name</label>
+                        <div class="relative flex items-center">
                         <span class="absolute left-4 text-[#7A7067]">
                             <i class="fa-regular fa-user"></i>
                         </span>
@@ -95,6 +107,7 @@
                 <a href="{{ Route::has('login') ? route('login') : '/login' }}" class="font-semibold text-[#D4AF37] hover:text-[#C09E30] transition-colors">
                     Sign in here
                 </a>
+            </div>
             </div>
         </div>
     </div>

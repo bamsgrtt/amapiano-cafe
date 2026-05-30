@@ -1,7 +1,19 @@
 <x-layouts.app title="Login - Amapiano Cafe">
     <div class="flex items-center justify-center min-h-[70vh] py-12 px-4 sm:px-6 lg:px-8">
-        <div class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-3xl border border-[#E6E0D5] p-8 shadow-xl">
+        <div class="w-full max-w-4xl bg-white/80 backdrop-blur-md rounded-3xl overflow-hidden border border-[#E6E0D5] shadow-xl grid grid-cols-1 lg:grid-cols-2">
             <!-- Header -->
+              <!-- KIRI: Bagian Gambar (Hanya muncul di layar komputer/laptop) -->
+            <div class="hidden lg:block relative min-h-[500px] rounded-l-3xl">
+                <img src="{{ asset('images/bg.png') }}"
+                     alt="Amapiano Cafe" 
+                     class="absolute inset-0 w-full h-full object-cover" />
+                <!-- Overlay gradasi warna hitam transparan agar gambar lebih menyatu -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-black/20 flex flex-col justify-end p-8 text-white">
+                    <h3 class="text-2xl font-serif mb-2">Amapiano Cafe</h3>
+                    <p class="text-sm opacity-80 font-light">Experience the perfect blend of rich coffee aroma and rhythmic vibes.</p>
+                </div>
+            </div>
+        <div class="p-8 sm:p-12 flex flex-col justify-center">
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-50 text-orange-600 mb-4">
                     <i class="fa-solid fa-right-to-bracket text-xl"></i>
@@ -77,5 +89,6 @@
                 </a>
             </div>
         </div>
+</div>
     </div>
 </x-layouts.app>
