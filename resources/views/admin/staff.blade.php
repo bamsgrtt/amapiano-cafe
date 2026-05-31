@@ -450,6 +450,18 @@
                         usedContent.classList.remove('hidden');
                         document.getElementById('used-by-msg').textContent = 'Check-in dilakukan pada ' + data.checked_in_at + '.';
                         resultContainer.classList.add('animate-shake');
+                    } else if (data.status === 'invalid_datetime') {
+                        // Invalid Date/Time (not today or early)
+                        resultIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-amber-100 text-amber-600';
+                        resultIcon.innerHTML = '<i class="fas fa-clock text-xl"></i>';
+                        resultTitle.textContent = 'Check-In Belum Diizinkan';
+                        resultSubtitle.textContent = data.message;
+                        resultBadge.className = 'px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold border border-amber-200';
+                        resultBadge.textContent = 'BLOCKED';
+                        
+                        invalidContent.classList.remove('hidden');
+                        document.getElementById('invalid-msg').textContent = data.message;
+                        resultContainer.classList.add('animate-shake');
                     } else {
                         // Invalid / Not Found
                         resultIcon.className = 'w-12 h-12 rounded-full flex items-center justify-center mr-4 bg-red-100 text-red-600';

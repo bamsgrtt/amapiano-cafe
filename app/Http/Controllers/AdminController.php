@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Reservation;
 use App\Models\User;
+use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
@@ -18,23 +20,61 @@ class AdminController extends Controller
         // 1. Statistics
         $startOfMonth = now()->startOfMonth()->toDateString();
         $endOfMonth = now()->endOfMonth()->toDateString();
-        
+
         $totalReservationsMonth = Reservation::whereBetween('date', [$startOfMonth, $endOfMonth])->count();
         $checkinsToday = Reservation::whereDate('date', today())->where('status', 'checked_in')->count();
-        
+
         // Capped occupancy percentage
         $totalTables = 25;
         $occupiedTablesCount = Reservation::whereDate('date', today())->where('status', 'checked_in')->distinct('table_id')->count();
         $occupancyRate = $totalTables > 0 ? min(100, round(($occupiedTablesCount / $totalTables) * 100)) : 0;
-        
-        // Estimated revenue (e.g. checked-in guests * Rp 150.000)
-        $checkedInGuests = Reservation::whereDate('date', today())->where('status', 'checked_in')->sum('guests');
-        $estimatedRevenueAmount = $checkedInGuests * 150000;
-        if ($estimatedRevenueAmount >= 1000000) {
-            $estimatedRevenue = 'Rp ' . number_format($estimatedRevenueAmount / 1000000, 1) . 'Jt';
-        } else {
-            $estimatedRevenue = 'Rp ' . number_format($estimatedRevenueAmount / 1000, 0) . 'Rb';
+
+        // Estimated revenue — Rp 40.000 weekday / Rp 60.000 weekend per checked-in guest
+        $todayIsWeekend = now()->timezone('Asia/Jakarta')->isWeekend();
+        $todayRate = $todayIsWeekend ? 60000 : 40000;
+
+        $checkedInGuestsToday = Reservation::whereDate('date', today())
+            ->where('status', 'checked_in')
+            ->sum('guests');
+        $estimatedRevenueToday = $checkedInGuestsToday * $todayRate;
+
+        // Weekly: sum each day's guests * that day's rate
+        $startOfWeek = now()->startOfWeek();
+        $estimatedRevenueWeekly = 0;
+        for ($d = 0; $d <= 6; $d++) {
+            $day = $startOfWeek->copy()->addDays($d);
+            $rate = $day->isWeekend() ? 60000 : 40000;
+            $guests = Reservation::whereDate('date', $day->toDateString())
+                ->where('status', 'checked_in')
+                ->sum('guests');
+            $estimatedRevenueWeekly += $guests * $rate;
         }
+
+        // Monthly: sum each day's guests * that day's rate
+        $startOfMonthDay = now()->startOfMonth();
+        $daysInMonth = now()->daysInMonth;
+        $estimatedRevenueMonthly = 0;
+        for ($d = 0; $d < $daysInMonth; $d++) {
+            $day = $startOfMonthDay->copy()->addDays($d);
+            $rate = $day->isWeekend() ? 60000 : 40000;
+            $guests = Reservation::whereDate('date', $day->toDateString())
+                ->where('status', 'checked_in')
+                ->sum('guests');
+            $estimatedRevenueMonthly += $guests * $rate;
+        }
+
+        /** Format a raw amount to a readable IDR string (Rb / Jt). */
+        $formatRevenue = static function (int $amount): string {
+            if ($amount >= 1000000) {
+                return 'Rp '.number_format($amount / 1000000, 1).'Jt';
+            }
+
+            return 'Rp '.number_format($amount / 1000, 0).'Rb';
+        };
+
+        $estimatedRevenue = $formatRevenue($estimatedRevenueToday);
+        $estimatedRevenueWeek = $formatRevenue($estimatedRevenueWeekly);
+        $estimatedRevenueMonth = $formatRevenue($estimatedRevenueMonthly);
 
         // 2. Chart data: last 7 days reservation vs checkins
         $chartLabels = [];
@@ -50,13 +90,13 @@ class AdminController extends Controller
         // 3. Reservations search & list
         $search = $request->input('search');
         $reservationsQuery = Reservation::latest();
-        if (!empty($search)) {
+        if (! empty($search)) {
             $searchClean = ltrim(strtoupper(trim($search)), '#');
             $reservationsQuery->where(function ($q) use ($search, $searchClean) {
                 $q->where('fullname', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$searchClean}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$searchClean}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
         $reservations = $reservationsQuery->paginate(10)->withQueryString();
@@ -86,7 +126,7 @@ class AdminController extends Controller
                 'end' => now()->addDays(15)->toDateString(),
                 'description' => 'Diskon 20% untuk semua menu minuman.',
                 'status' => 'Aktif',
-            ]
+            ],
         ]);
 
         return view('admin.dashboard', compact(
@@ -94,6 +134,8 @@ class AdminController extends Controller
             'checkinsToday',
             'occupancyRate',
             'estimatedRevenue',
+            'estimatedRevenueWeek',
+            'estimatedRevenueMonth',
             'chartLabels',
             'chartReservations',
             'chartCheckins',
@@ -137,7 +179,7 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'store_open' => $open,
-            'message' => 'Status operasional berhasil diperbarui.'
+            'message' => 'Status operasional berhasil diperbarui.',
         ]);
     }
 
@@ -174,7 +216,7 @@ class AdminController extends Controller
     /**
      * Delete a promo/event by ID.
      */
-    public function deletePromo($id): \Illuminate\Http\RedirectResponse
+    public function deletePromo($id): RedirectResponse
     {
         $promos = Cache::get('promos', []);
         $promos = array_filter($promos, function ($p) use ($id) {
@@ -189,7 +231,7 @@ class AdminController extends Controller
     /**
      * Delete an admin or staff user account.
      */
-    public function deleteUser($id): \Illuminate\Http\RedirectResponse
+    public function deleteUser($id): RedirectResponse
     {
         if (auth()->id() == $id) {
             return back()->withErrors(['error_user' => 'Anda tidak dapat menghapus akun Anda sendiri.']);
@@ -204,15 +246,27 @@ class AdminController extends Controller
     /**
      * Update reservation status directly from admin panel.
      */
-    public function updateReservationStatus(Request $request, $id): \Illuminate\Http\RedirectResponse
+    public function updateReservationStatus(Request $request, $id): RedirectResponse
     {
         $validated = $request->validate([
-            'status' => 'required|string|in:pending,checked_in,cancelled'
+            'status' => 'required|string|in:pending,checked_in,cancelled',
         ]);
 
         $res = Reservation::findOrFail($id);
         $updateData = ['status' => $validated['status']];
         if ($validated['status'] === 'checked_in') {
+            // Validate Date & Time
+            $today = now()->timezone('Asia/Jakarta')->toDateString();
+            if ($res->date !== $today) {
+                return back()->with('error_reservation', 'Tidak dapat melakukan check-in: Tanggal reservasi tidak sesuai (harus hari ini).');
+            }
+
+            $bookingDateTime = Carbon::parse($res->date.' '.$res->time, 'Asia/Jakarta');
+            $now = now()->timezone('Asia/Jakarta');
+            if ($now->lt($bookingDateTime)) {
+                return back()->with('error_reservation', 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.');
+            }
+
             $updateData['checked_in_at'] = now();
         }
         $res->update($updateData);

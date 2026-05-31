@@ -1,13 +1,15 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReservationController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\StaffController;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $storeOpen = \Illuminate\Support\Facades\Cache::get('store_open', true);
+    $storeOpen = Cache::get('store_open', true);
+
     return view('welcome', compact('storeOpen'));
 })->name('home');
 
@@ -40,6 +42,12 @@ Route::middleware(['auth', 'role:staff,admin'])->group(function () {
     Route::get('/staff/validate', [StaffController::class, 'validateReservation'])->name('staff.validate');
     Route::post('/staff/checkin', [StaffController::class, 'checkIn'])->name('staff.checkin');
 });
+Route::get('/reservation', function () {
+    $storeOpen = Cache::get('store_open', true);
+
+    return view('reservation', compact('storeOpen'));
+})->name('reservation');
 
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 Route::get('/reservations/booked', [ReservationController::class, 'booked'])->name('reservations.booked');
+Route::get('/reservations/{code}/download', [ReservationController::class, 'download'])->name('reservations.download');

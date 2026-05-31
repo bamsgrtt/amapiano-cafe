@@ -85,7 +85,7 @@
                 <!-- DASHBOARD TAB -->
                 <div id="tab-dashboard" class="tab-content fade-in space-y-6">
                     <!-- Stats Grid -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="w-12 h-12 bg-amapiano-100 rounded-xl flex items-center justify-center text-amapiano-600">
@@ -113,16 +113,45 @@
                             <h3 class="text-3xl font-display font-bold text-gray-900">{{ $occupancyRate }}%</h3>
                             <p class="text-sm text-gray-500 mt-1">Okupansi Meja Hari Ini</p>
                         </div>
+                        {{-- Revenue: Daily --}}
                         <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="w-12 h-12 bg-forest-100 rounded-xl flex items-center justify-center text-forest-600">
                                     <i class="fas fa-money-bill-wave text-xl"></i>
                                 </div>
+                                <span class="text-xs font-semibold bg-forest-50 text-forest-700 px-2 py-1 rounded-full">Hari Ini</span>
                             </div>
-                            <h3 class="text-3xl font-display font-bold text-gray-900">{{ $estimatedRevenue }}</h3>
-                            <p class="text-sm text-gray-500 mt-1">Estimasi Pendapatan Hari Ini</p>
+                            <h3 class="text-2xl font-display font-bold text-gray-900">{{ $estimatedRevenue }}</h3>
+                            <p class="text-sm text-gray-500 mt-1">Estimasi Pendapatan</p>
+                        </div>
+                        {{-- Revenue: Weekly --}}
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600">
+                                    <i class="fas fa-chart-line text-xl"></i>
+                                </div>
+                                <span class="text-xs font-semibold bg-amber-50 text-amber-700 px-2 py-1 rounded-full">Minggu Ini</span>
+                            </div>
+                            <h3 class="text-2xl font-display font-bold text-gray-900">{{ $estimatedRevenueWeek }}</h3>
+                            <p class="text-sm text-gray-500 mt-1">Estimasi Pendapatan</p>
                         </div>
                     </div>
+
+                    {{-- Revenue: Monthly (full width row) --}}
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex items-center gap-5">
+                        <div class="w-12 h-12 shrink-0 bg-rose-100 rounded-xl flex items-center justify-center text-rose-600">
+                            <i class="fas fa-calendar-alt text-xl"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500">Estimasi Pendapatan</p>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-2xl font-display font-bold text-gray-900">{{ $estimatedRevenueMonth }}</span>
+                                <span class="text-xs font-semibold bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full">Bulan Ini</span>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-0.5">Weekday Rp 40.000 / Weekend Rp 60.000 per tamu check-in</p>
+                        </div>
+                    </div>
+
 
                     <!-- Charts & Recent -->
                     <div class="grid lg:grid-cols-3 gap-6">
@@ -177,6 +206,11 @@
                     @if(session('success_reservation'))
                         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
                             {{ session('success_reservation') }}
+                        </div>
+                    @endif
+                    @if(session('error_reservation'))
+                        <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg">
+                            {{ session('error_reservation') }}
                         </div>
                     @endif
                     <form action="{{ route('admin.dashboard') }}" method="GET" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">

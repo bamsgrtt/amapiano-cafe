@@ -52,17 +52,17 @@ test('admin can update reservation status', function () {
         'area' => 'Main Hall',
         'table_id' => 'hb-1',
         'guests' => 2,
-        'status' => 'pending'
+        'status' => 'pending',
     ]);
 
     $response = $this->actingAs($admin)->post("/admin/reservations/{$reservation->id}/status", [
-        'status' => 'checked_in'
+        'status' => 'checked_in',
     ]);
 
     $response->assertRedirect();
     $this->assertDatabaseHas('reservations', [
         'id' => $reservation->id,
-        'status' => 'checked_in'
+        'status' => 'checked_in',
     ]);
 });
 
@@ -80,8 +80,66 @@ test('bookings are rejected when store is closed', function () {
     ]);
 
     $response->assertStatus(422)
-             ->assertJsonPath('success', false)
-             ->assertJsonPath('message', 'Reservasi online saat ini sedang ditutup.');
+        ->assertJsonPath('success', false)
+        ->assertJsonPath('message', 'Reservasi online saat ini sedang ditutup.');
 
     Cache::put('store_open', true); // restore status
+});
+
+test('admin cannot update status to checked_in for a future reservation', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $tomorrow = now()->timezone('Asia/Jakarta')->addDay();
+    $reservation = Reservation::create([
+        'code' => 'AMP-FUT-ADM',
+        'fullname' => 'Future Customer',
+        'phone' => '1234567890',
+        'date' => $tomorrow->toDateString(),
+        'time' => '19:00',
+        'area' => 'Main Hall',
+        'table_id' => 'hb-1',
+        'guests' => 2,
+        'status' => 'pending',
+    ]);
+
+    $response = $this->actingAs($admin)->post("/admin/reservations/{$reservation->id}/status", [
+        'status' => 'checked_in',
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error_reservation', 'Tidak dapat melakukan check-in: Tanggal reservasi tidak sesuai (harus hari ini).');
+
+    $this->assertDatabaseHas('reservations', [
+        'id' => $reservation->id,
+        'status' => 'pending',
+    ]);
+});
+
+test('admin cannot update status to checked_in for an early reservation', function () {
+    $admin = User::factory()->create(['role' => 'admin']);
+    $nowInJakarta = now()->timezone('Asia/Jakarta');
+    $futureTime = $nowInJakarta->copy()->addHour();
+
+    $reservation = Reservation::create([
+        'code' => 'AMP-ERL-ADM',
+        'fullname' => 'Early Customer',
+        'phone' => '1234567890',
+        'date' => $nowInJakarta->toDateString(),
+        'time' => $futureTime->format('H:i'),
+        'area' => 'Main Hall',
+        'table_id' => 'hb-1',
+        'guests' => 2,
+        'status' => 'pending',
+    ]);
+
+    $response = $this->actingAs($admin)->post("/admin/reservations/{$reservation->id}/status", [
+        'status' => 'checked_in',
+    ]);
+
+    $response->assertRedirect();
+    $response->assertSessionHas('error_reservation', 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.');
+
+    $this->assertDatabaseHas('reservations', [
+        'id' => $reservation->id,
+        'status' => 'pending',
+    ]);
 });

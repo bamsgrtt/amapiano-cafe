@@ -3,7 +3,7 @@
         <div class="w-full max-w-4xl bg-white/80 backdrop-blur-md overflow-hidden rounded-3xl border border-[#E6E0D5] grid grid-cols-1 lg:grid-cols-2 shadow-xl">
               <!-- KIRI: Bagian Gambar (Hanya muncul di layar komputer/laptop) -->
             <div class="hidden lg:block relative min-h-[500px] rounded-l-3xl">
-                <img src="{{ asset('images/logo.jpg') }}"
+                <img src="{{ asset('images/bg.png') }}"
                      alt="Amapiano Cafe" 
                      class="absolute inset-0 w-full h-full object-cover" />
                 <!-- Overlay gradasi warna hitam transparan agar gambar lebih menyatu -->

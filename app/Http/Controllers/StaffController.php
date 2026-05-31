@@ -21,23 +21,23 @@ class StaffController extends Controller
 
         $reservationsQuery = Reservation::where('date', '>=', $today);
 
-        if (!empty($search)) {
+        if (! empty($search)) {
             $searchClean = ltrim(strtoupper(trim($search)), '#');
             $reservationsQuery->where(function ($q) use ($search, $searchClean) {
                 $q->where('fullname', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$searchClean}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$searchClean}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
         $reservationsQuery->orderBy('date')->orderBy('time');
 
-        if (!empty($statusFilter) && $statusFilter !== 'Semua Status') {
+        if (! empty($statusFilter) && $statusFilter !== 'Semua Status') {
             $statusMap = [
                 'Pending' => 'pending',
                 'Checked In' => 'checked_in',
-                'Cancelled' => 'cancelled'
+                'Cancelled' => 'cancelled',
             ];
             if (isset($statusMap[$statusFilter])) {
                 $reservationsQuery->where('status', $statusMap[$statusFilter]);
@@ -65,7 +65,7 @@ class StaffController extends Controller
         $tableCapacities = [
             'Main Hall' => 8,
             'Terrace' => 10,
-            'VIP Lounge' => 7
+            'VIP Lounge' => 7,
         ];
         foreach ($areas as $area) {
             $occupied = Reservation::whereDate('date', $today)
@@ -75,7 +75,7 @@ class StaffController extends Controller
                 ->count();
             $areaOccupancy[$area] = [
                 'occupied' => $occupied,
-                'total' => $tableCapacities[$area]
+                'total' => $tableCapacities[$area],
             ];
         }
 
@@ -106,29 +106,30 @@ class StaffController extends Controller
     {
         $code = strtoupper(trim($request->input('code')));
         $code = ltrim($code, '#');
-        
+
         if (empty($code)) {
             return response()->json([
                 'valid' => false,
                 'status' => 'empty',
-                'message' => 'Format kode reservasi salah.'
+                'message' => 'Format kode reservasi salah.',
             ]);
         }
 
         $reservation = Reservation::where('code', $code)
-            ->orWhere('code', 'AMP-' . $code)
+            ->orWhere('code', 'AMP-'.$code)
             ->first();
 
-        if (!$reservation) {
+        if (! $reservation) {
             return response()->json([
                 'valid' => false,
                 'status' => 'not_found',
-                'message' => 'Kode tidak ditemukan. Pastikan pelanggan memberikan kode yang benar.'
+                'message' => 'Kode tidak ditemukan. Pastikan pelanggan memberikan kode yang benar.',
             ]);
         }
 
         if ($reservation->status === 'checked_in') {
             $timeStr = $reservation->checked_in_at ? Carbon::parse($reservation->checked_in_at)->timezone('Asia/Jakarta')->format('H:i') : '-';
+
             return response()->json([
                 'valid' => false,
                 'status' => 'used',
@@ -141,22 +142,41 @@ class StaffController extends Controller
             return response()->json([
                 'valid' => false,
                 'status' => 'cancelled',
-                'message' => 'Reservasi ini telah dibatalkan.'
+                'message' => 'Reservasi ini telah dibatalkan.',
+            ]);
+        }
+
+        // Validate Date & Time
+        $today = now()->timezone('Asia/Jakarta')->toDateString();
+        if ($reservation->date !== $today) {
+            return response()->json([
+                'valid' => false,
+                'status' => 'invalid_datetime',
+                'message' => 'Tidak dapat melakukan check-in: Tanggal reservasi tidak sesuai (harus hari ini).',
+            ]);
+        }
+
+        $bookingDateTime = Carbon::parse($reservation->date.' '.$reservation->time, 'Asia/Jakarta');
+        $now = now()->timezone('Asia/Jakarta');
+        if ($now->lt($bookingDateTime)) {
+            return response()->json([
+                'valid' => false,
+                'status' => 'invalid_datetime',
+                'message' => 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.',
             ]);
         }
 
         // Check if user is late (more than 15 minutes past scheduled time)
-        $bookingDateTime = Carbon::parse($reservation->date . ' ' . $reservation->time);
         $late = false;
-        
-        if (now()->timezone('Asia/Jakarta')->greaterThan($bookingDateTime->copy()->addMinutes(15))) {
+
+        if ($now->greaterThan($bookingDateTime->copy()->addMinutes(15))) {
             $late = true;
         }
 
         $tableNames = [
             'hb-1' => 'Table HB-1', 'hb-2' => 'Table HB-2', 'hb-3' => 'Table HB-3', 'hb-4' => 'Table HB-4', 'hb-5' => 'Table HB-5', 'hb-6' => 'Table HB-6', 'hb-7' => 'Table HB-7', 'hb-8' => 'Table HB-8',
             'cg-1' => 'Table CG-1', 'cg-2' => 'Table CG-2', 'cg-3' => 'Table CG-3', 'cg-4' => 'Table CG-4', 'cg-5' => 'Table CG-5', 'cg-6' => 'Table CG-6', 'cg-7' => 'Table CG-7', 'cg-8' => 'Table CG-8', 'cg-9' => 'Table CG-9', 'cg-10' => 'Table CG-10',
-            'lb-1' => 'Table LB-1', 'lb-2' => 'Table LB-2', 'lb-3' => 'Table LB-3', 'lb-4' => 'Table LB-4', 'lb-5' => 'Table LB-5', 'lb-6' => 'Table LB-6', 'lb-7' => 'Table LB-7'
+            'lb-1' => 'Table LB-1', 'lb-2' => 'Table LB-2', 'lb-3' => 'Table LB-3', 'lb-4' => 'Table LB-4', 'lb-5' => 'Table LB-5', 'lb-6' => 'Table LB-6', 'lb-7' => 'Table LB-7',
         ];
 
         return response()->json([
@@ -167,9 +187,9 @@ class StaffController extends Controller
                 'code' => $reservation->code,
                 'fullname' => $reservation->fullname,
                 'phone' => $reservation->phone,
-                'datetime' => Carbon::parse($reservation->date)->translatedFormat('d M Y') . ', ' . $reservation->time,
-                'location' => $reservation->area . ' / ' . ($tableNames[$reservation->table_id] ?? $reservation->table_id),
-            ]
+                'datetime' => Carbon::parse($reservation->date)->translatedFormat('d M Y').', '.$reservation->time,
+                'location' => $reservation->area.' / '.($tableNames[$reservation->table_id] ?? $reservation->table_id),
+            ],
         ]);
     }
 
@@ -180,15 +200,33 @@ class StaffController extends Controller
     {
         $code = strtoupper(trim($request->input('code')));
         $code = ltrim($code, '#');
-        
+
         $reservation = Reservation::where('code', $code)
-            ->orWhere('code', 'AMP-' . $code)
+            ->orWhere('code', 'AMP-'.$code)
             ->firstOrFail();
 
         if ($reservation->status === 'checked_in') {
             return response()->json([
                 'success' => false,
-                'message' => 'Reservasi ini sudah di-check-in sebelumnya.'
+                'message' => 'Reservasi ini sudah di-check-in sebelumnya.',
+            ]);
+        }
+
+        // Validate Date & Time
+        $today = now()->timezone('Asia/Jakarta')->toDateString();
+        if ($reservation->date !== $today) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat melakukan check-in: Tanggal reservasi tidak sesuai (harus hari ini).',
+            ]);
+        }
+
+        $bookingDateTime = Carbon::parse($reservation->date.' '.$reservation->time, 'Asia/Jakarta');
+        $now = now()->timezone('Asia/Jakarta');
+        if ($now->lt($bookingDateTime)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.',
             ]);
         }
 
@@ -207,7 +245,7 @@ class StaffController extends Controller
         $tableNames = [
             'hb-1' => 'Table HB-1', 'hb-2' => 'Table HB-2', 'hb-3' => 'Table HB-3', 'hb-4' => 'Table HB-4', 'hb-5' => 'Table HB-5', 'hb-6' => 'Table HB-6', 'hb-7' => 'Table HB-7', 'hb-8' => 'Table HB-8',
             'cg-1' => 'Table CG-1', 'cg-2' => 'Table CG-2', 'cg-3' => 'Table CG-3', 'cg-4' => 'Table CG-4', 'cg-5' => 'Table CG-5', 'cg-6' => 'Table CG-6', 'cg-7' => 'Table CG-7', 'cg-8' => 'Table CG-8', 'cg-9' => 'Table CG-9', 'cg-10' => 'Table CG-10',
-            'lb-1' => 'Table LB-1', 'lb-2' => 'Table LB-2', 'lb-3' => 'Table LB-3', 'lb-4' => 'Table LB-4', 'lb-5' => 'Table LB-5', 'lb-6' => 'Table LB-6', 'lb-7' => 'Table LB-7'
+            'lb-1' => 'Table LB-1', 'lb-2' => 'Table LB-2', 'lb-3' => 'Table LB-3', 'lb-4' => 'Table LB-4', 'lb-5' => 'Table LB-5', 'lb-6' => 'Table LB-6', 'lb-7' => 'Table LB-7',
         ];
 
         return response()->json([
@@ -216,9 +254,9 @@ class StaffController extends Controller
             'reservation' => [
                 'fullname' => $reservation->fullname,
                 'initials' => $initials,
-                'location' => $reservation->area . ' / ' . ($tableNames[$reservation->table_id] ?? $reservation->table_id),
-                'time' => now()->timezone('Asia/Jakarta')->format('H:i')
-            ]
+                'location' => $reservation->area.' / '.($tableNames[$reservation->table_id] ?? $reservation->table_id),
+                'time' => now()->timezone('Asia/Jakarta')->format('H:i'),
+            ],
         ]);
     }
 }

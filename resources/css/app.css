@@ -8,6 +8,7 @@
 
 @theme {
     --color-cream: #F5F1EB;
+    --color-navy: #2D2B26;
     --font-serif: 'Playfair Display', Georgia, serif;
     --font-sans: 'Outfit', 'Instrument Sans', ui-sans-serif, sans-serif;
 
@@ -40,9 +41,11 @@
         border-color: #C5A880;
         box-shadow: 0 0 0 4px rgba(197, 168, 128, 0.25);
     }
+
     .hide-scrollbar::-webkit-scrollbar {
         display: none;
     }
+
     .hide-scrollbar {
         -ms-overflow-style: none;
         scrollbar-width: none;

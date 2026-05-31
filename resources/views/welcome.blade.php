@@ -1,1268 +1,661 @@
 <x-layouts.app title="Halaman Beranda">
-    <section class="relative bg-cover bg-center bg-no-repeat h-[500px] flex items-center justify-center" 
-         style="background-image: url('{{ asset('images/bg.png') }}');">
-    
-    <!-- Lapisan Gelap (Overlay) agar teks lebih mudah dibaca -->
-    <div class="absolute inset-0 bg-black/40"></div>
+ <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-    <!-- Konten di Atas Gambar -->
-    <div class="relative max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8 text-white">
-        <h1 class="text-4xl sm:text-6xl font-semibold tracking-tight mb-4">
-            Amapiano
-        </h1>
-        <span class="text-2xl sm:text-2xl font-l mb-4">
-            Thematic Resto & Cafe
-        </span><br>
-        <span class="text-lg sm:text-lg mb-4 font-l uppercase">
-            Rich Village - Jember
-        </span>
-        <p class="text-lg sm:text-xl font-light text-gray-200 mb-8 max-w-2xl mx-auto">
-           Nikmati perpaduan cita rasa Western & Nusantara dalam suasana rustic yang
-estetik, dikelilingi kincir angin dan taman hijau yang memukau.
-        </p>
-        <div class="flex justify-center space-x-4">
-            <a href="#booking-section" class="px-6 py-3 bg-orange-500 text-white font-medium rounded-full hover:bg-orange-600 transition duration-150">
-                Reservasi Sekarang
-            </a>
-            <a href="#" class="px-6 py-3 border-2 border-white text-white font-medium rounded-full hover:bg-white hover:text-gray-900 transition duration-150">
-                Lihat Menu
-            </a>
-        </div>
-    </div>
-</section>
-<section class="bg-orange-700 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-    <!-- Di bawah ini adalah pembuka grid yang mengunci 4 kolom dalam 1 baris -->
-    <div class="grid grid-cols-4 gap-6">
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; }
+        .font-display { font-family: 'Playfair Display', serif; }
+        .font-script { font-family: 'Dancing Script', cursive; }
         
-        <!-- Item 1 (Kolom 1) -->
-        <div class="rounded-2xl text-center">
-            <h3 class="font-semibold text-lg text-white">10:00-20:00</h3>
-            <p class="text-sm text-white mt-2">Jam Operasional</p>
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes windmill {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+        
+        .animate-fade-in-up { animation: fadeInUp 0.8s ease-out forwards; }
+        .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .animate-slide-left { animation: slideInLeft 0.8s ease-out forwards; }
+        .animate-slide-right { animation: slideInRight 0.8s ease-out forwards; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .animate-windmill { animation: windmill 8s linear infinite; }
+        
+        .reveal, .scroll-reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.visible, .scroll-reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(135deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.5) 100%);
+        }
+        
+        .text-shadow {
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+        }
+        
+        .card-hover {
+            transition: all 0.4s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .nav-link {
+            position: relative;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #d88234;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #d88234 0%, #c96c2b 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #c96c2b 0%, #a75525 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(216, 130, 52, 0.4);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #166534 0%, #15803d 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(22, 101, 52, 0.4);
+        }
+        
+        .btn-outline {
+            border: 2px solid #d88234;
+            color: #d88234;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+        .btn-outline:hover {
+            background: #d88234;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(216, 130, 52, 0.3);
+        }
+        
+        .gallery-item {
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .gallery-item img {
+            transition: transform 0.6s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d88234;
+            border-radius: 4px;
+        }
+        
+        .parallax-bg {
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+        
+        @media (max-width: 768px) {
+            .parallax-bg {
+                background-attachment: scroll;
+            }
+        }
+
+        .opt2 {
+            position: relative;
+            min-height: 500px;
+            background: url('{{ asset('images/rule.png') }}') center/cover no-repeat;
+        }
+
+        .opt2-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(10,46,26,0.85) 0%, rgba(26,92,53,0.7) 50%, rgba(10,46,26,0.85) 100%);
+        }
+        .opt2-content {
+            position: relative;
+            z-index: 1;
+            padding: 60px 40px;
+        }
+
+        .logo-dark {
+            background: linear-gradient(135deg, #3d2314 0%, #2a1810 100%);
+        }
+        .logo-dark svg {
+            color: #f9eddb;
+        }
+        
+        .footer-section {
+            background: linear-gradient(180deg, #f5efe6 0%, #e8ddd0 100%);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #d88234 0%, #c96c2b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+<!-- Hero Section -->
+    <section id="beranda" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="{{ asset('images/bg.png') }}" alt="Amapiano Thematic Resto & Cafe" class="w-full h-full object-cover">
+            <div class="hero-gradient absolute inset-0"></div>
         </div>
-
-        <!-- Item 2 (Kolom 2) -->
-        <div class=" rounded-2xl  text-center">
-            <h3 class="font-semibold text-lg text-white">20+</h3>
-            <p class="text-sm text-white mt-2">Menu Pilihan</p>
-        </div>
-
-        <!-- Item 3 (Kolom 3) -->
-        <div class="rounded-2xl   text-center">
-            <h3 class="font-semibold text-lg text-white">Rustic</h3>
-            <p class="text-sm text-white mt-2">Tema Estetik</p>
-        </div>
-
-        <!-- Item 4 (Kolom 4) -->
-        <div class="rounded-2xl  text-center">
-            <h3 class="font-semibold text-lg text-white">4.8</h3>
-            <p class="text-sm text-white mt-2">Rating Google</p>
-        </div>
-
-    </div> <!-- Penutup grid -->
-</section>
-
-
-@push('styles')
-<style>
-    .font-display { font-family: 'Playfair Display', serif; }
-    
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideInScale { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: scale(1); } }
-    @keyframes tablePop { 0% { transform: scale(1); } 50% { transform: scale(1.15); } 100% { transform: scale(1); } }
-    @keyframes checkmark { 0% { transform: scale(0); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-    @keyframes confettiFall { 0% { transform: translateY(-100%) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
-    @keyframes pulseGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); } 50% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } }
-    @keyframes countdownPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-    @keyframes shimmer { 0% { background-position: -200% center; } 100% { background-position: 200% center; } }
-    
-    .animate-fade-in-up { animation: fadeInUp 0.6s ease-out forwards; }
-    .animate-slide-in-scale { animation: slideInScale 0.5s ease-out forwards; }
-    .animate-table-pop { animation: tablePop 0.4s ease-out; }
-    
-    .step-circle {
-        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    .room-card {
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .room-card:hover { transform: translateY(-4px); }
-    .room-card.selected {
-        transform: translateY(-4px);
-        box-shadow: 0 20px 40px rgba(216, 130, 52, 0.25);
-    }
-    
-    .table-seat {
-        transition: all 0.3s ease;
-    }
-    .table-seat.available:hover { transform: scale(1.12); z-index: 10; }
-    .table-seat.selected { animation: tablePop 0.4s ease-out; }
-    
-    .confetti-piece {
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        border-radius: 2px;
-        animation: confettiFall 2.5s ease-out forwards;
-        pointer-events: none;
-        z-index: 9999;
-    }
-    
-    .progress-line { transition: all 0.6s ease; }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #d88234 0%, #c96c2b 100%);
-        transition: all 0.3s ease;
-    }
-    .btn-primary:hover { background: linear-gradient(135deg, #c96c2b 0%, #a75525 100%); transform: translateY(-2px); box-shadow: 0 8px 20px rgba(216, 130, 52, 0.4); }
-    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-    
-    .table-label {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-weight: 800;
-        color: white;
-        font-size: 11px;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
-        pointer-events: none;
-    }
-    
-    .floor-plan-bg {
-        background: linear-gradient(145deg, #f8f4ec 0%, #ede5d5 50%, #e8dcc8 100%);
-        position: relative;
-        overflow: hidden;
-    }
-    
-    .ticket-border {
-        border: 2px dashed #d88234;
-        position: relative;
-    }
-    .ticket-border::before, .ticket-border::after {
-        content: '';
-        position: absolute;
-        width: 24px;
-        height: 24px;
-        background: white;
-        border-radius: 50%;
-    }
-    .ticket-border::before { left: -13px; top: 50%; transform: translateY(-50%); }
-    .ticket-border::after { right: -13px; top: 50%; transform: translateY(-50%); }
-    
-    .shimmer-text {
-        background: linear-gradient(90deg, #d88234, #e09a50, #d88234);
-        background-size: 200% auto;
-        animation: shimmer 3s linear infinite;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    
-    .countdown-bar {
-        transition: width 1s linear;
-    }
-    
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #d88234; border-radius: 4px; }
-    
-    .step-content { transition: all 0.5s ease; }
-</style>
-@endpush
-
-<div id="booking-section" class="py-12 bg-gray-50/50">
-    <!-- Success / Ticket Modal -->
-    <div id="success-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);">
-        <div class="bg-white rounded-3xl max-w-md w-full animate-slide-in-scale shadow-2xl overflow-hidden" style="max-height: 90vh; overflow-y: auto;">
-            
-            <!-- Success Header -->
-            <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center">
-                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
+        
+        <div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
+            <div class="animate-fade-in-up">
+                <p class="font-script text-2xl md:text-3xl text-amapiano-300 mb-4" id="hero-welcome">Selamat Datang di</p>
+                <h1 class="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 text-shadow" id="hero-title">
+                    Amapiano
+                </h1>
+                <p class="text-xl md:text-2xl text-white/90 mb-2 font-light" id="hero-subtitle">Thematic Resto & Cafe</p>
+                <div class="flex items-center justify-center space-x-4 mb-8">
+                    <div class="h-px w-16 bg-white/50"></div>
+                    <p class="text-white/80 text-sm tracking-widest uppercase" id="hero-tagline">Rich Village • Jember</p>
+                    <div class="h-px w-16 bg-white/50"></div>
                 </div>
-                <h3 class="font-display text-2xl font-bold text-white">Reservasi Berhasil! 🎉</h3>
-                <p class="text-green-100 text-sm mt-1">Meja Anda telah berhasil dipesan</p>
+                <p class="text-white/70 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed" id="hero-desc">
+                    Nikmati perpaduan cita rasa Western & Nusantara dalam suasana rustic yang estetik, dikelilingi kincir angin dan taman hijau yang memukau.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <a href="{{ Route::has('reservation') ? route('reservation') : '/reservation' }}" class="btn-primary text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg flex items-center space-x-2" id="hero-reserve-btn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span id="hero-reserve-text">Reservasi Sekarang</span>
+                    </a>
+                    <a href="#aturan" class="border-2 border-white/50 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition-all flex items-center space-x-2" id="hero-menu-btn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        <span id="hero-view-menu">Aturan Cafe</span>
+                    </a>
+                </div>
             </div>
             
-            <!-- Booking Ticket -->
-            <div class="p-6">
-                <div class="ticket-border rounded-xl p-5 bg-amber-50">
-                    <div class="text-center mb-4">
-                        <p class="text-xs text-gray-500 uppercase tracking-widest">Booking Code</p>
-                        <p class="font-display text-3xl font-bold shimmer-text" id="ticket-booking-code">#AMP-000</p>
-                    </div>
-                    
-                    <div class="space-y-2 text-sm mb-4">
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Ruangan</span>
-                            <span class="font-bold text-gray-900" id="ticket-room">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Meja</span>
-                            <span class="font-bold text-gray-900" id="ticket-table">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Tanggal</span>
-                            <span class="font-bold text-gray-900" id="ticket-date">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Waktu</span>
-                            <span class="font-bold text-gray-900" id="ticket-time">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Nama</span>
-                            <span class="font-bold text-gray-900" id="ticket-name">-</span>
-                        </div>
-                        <div class="flex justify-between py-1">
-                            <span class="text-gray-500">No. HP</span>
-                            <span class="font-bold text-gray-900" id="ticket-phone">-</span>
-                        </div>
-                    </div>
-                    
-                    <!-- QR Code -->
-                    <div class="text-center">
-                        <p class="text-xs text-gray-500 mb-2">Scan QR Code untuk verifikasi</p>
-                        <div class="inline-block bg-white p-3 rounded-xl shadow-md">
-                            <svg id="qr-code" class="w-32 h-32" viewBox="0 0 100 100"></svg>
-                        </div>
-                    </div>
+            <!-- Scroll Indicator -->
+        </div>
+            <div class="absolute bottom-20 left-1/2 transform -translate-x-1/2 animate-bounce">
+                <svg class="w-6 h-6 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                </svg>
+            </div>
+    </section>
+
+    <!-- Stats Bar -->
+    <section class="bg-amapiano-700 py-8">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+                <div class="scroll-reveal">
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white" id="stat-hours">10:00-20:00</p>
+                    <p class="text-amapiano-200 text-sm mt-2" id="stat-hours-label">Jam Operasional</p>
                 </div>
-                
-                <!-- Time Limit Notice -->
-                <div class="mt-4 bg-red-50 border border-red-200 rounded-xl p-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                <div class="scroll-reveal">
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white" id="stat-menu">20+</p>
+                    <p class="text-amapiano-200 text-sm mt-2" id="stat-menu-label">Menu Pilihan</p>
+                </div>
+                <div class="scroll-reveal">
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white" id="stat-theme">Rustic</p>
+                    <p class="text-amapiano-200 text-sm mt-2" id="stat-theme-label">Tema Estetik</p>
+                </div>
+                <div class="scroll-reveal">
+                    <p class="text-3xl md:text-4xl font-display font-bold text-white" id="stat-rating">4.8</p>
+                    <p class="text-amapiano-200 text-sm mt-2" id="stat-rating-label">Rating Google</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+        <!-- About Section -->
+    <section id="tentang" class="py-20 md:py-28 bg-white">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+                <div class="reveal">
+                    <div class="relative">
+                        <img src="{{ asset('images/inter.png') }}" alt="Interior Amapiano" class="rounded-2xl shadow-2xl w-full">
+                        <div class="absolute -bottom-6 -right-6 w-48 h-48 bg-amapiano-100 rounded-2xl -z-10 hidden md:block"></div>
+                        <div class="absolute -top-6 -left-6 w-32 h-32 bg-forest-100 rounded-full -z-10 hidden md:block"></div>
+                        <div class="absolute top-4 right-4 animate-windmill opacity-20">
+                            <svg class="w-16 h-16 text-amapiano-600" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="8" fill="currentColor"/>
+                                <rect x="46" y="10" width="8" height="80" rx="2" fill="currentColor"/>
+                                <rect x="10" y="46" width="80" height="8" rx="2" fill="currentColor"/>
                             </svg>
                         </div>
-                        <div>
-                            <p class="text-red-800 text-sm font-bold">⏰ Batas Waktu 2 Jam</p>
-                            <p class="text-red-600 text-xs mt-0.5">Reservasi akan otomatis dibatalkan jika Anda tidak datang dalam 2 jam dari waktu yang dipilih. Meja akan dilepas untuk tamu lain.</p>
-                        </div>
-                    </div>
-                    <!-- Countdown Timer -->
-                    <div class="mt-3">
-                        <div class="flex items-center justify-between text-xs text-red-600 mb-1">
-                            <span>Batas waktu</span>
-                            <span id="countdown-text" class="font-bold">02:00:00</span>
-                        </div>
-                        <div class="w-full bg-red-100 rounded-full h-2">
-                            <div id="countdown-bar" class="countdown-bar bg-red-500 h-2 rounded-full" style="width: 100%;"></div>
-                        </div>
                     </div>
                 </div>
                 
-                <!-- Rules Reminder -->
-                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-3">
-                    <p class="text-blue-800 text-xs font-semibold mb-1"> Pengingat:</p>
-                    <ul class="text-blue-700 text-xs space-y-0.5">
-                        <li>• Datang sesuai waktu reservasi</li>
-                        <li>• Tunjukkan booking code saat arrival</li>
-                        <li>• Min. order Rp 40.000 (weekday) / Rp 60.000 (weekend)</li>
-                        <li>• Menu dipesan via QR di meja</li>
-                    </ul>
-                </div>
-                
-                <button onclick="resetAll()" class="btn-primary text-white w-full py-3 rounded-xl font-semibold text-sm mt-4">
-                    Buat Reservasi Baru
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <div class="max-w-4xl mx-auto px-4 py-6 md:py-10">
-        
-        <!-- Header -->
-        <div class="text-center mb-8 animate-fade-in-up">
-            <div class="flex items-center justify-center space-x-3 mb-3">
-                <div class="w-10 h-10 bg-amapiano-500 rounded-full flex items-center justify-center">
-                    <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-                </div>
-                <div>
-                    <h1 class="font-display text-xl font-bold text-gray-900">Amapiano</h1>
-                    <p class="text-xs text-gray-500">Thematic Resto & Cafe</p>
-                </div>
-            </div>
-            <h2 class="font-display text-2xl md:text-3xl font-bold text-gray-900">Reservasi Meja Online</h2>
-            <p class="text-gray-500 text-sm mt-1">Pilih tanggal, ruangan, meja favorit Anda</p>
-        </div>
-
-        @if(!($storeOpen ?? true))
-            <div class="bg-white rounded-3xl shadow-xl p-8 md:p-12 text-center border border-red-100 max-w-xl mx-auto animate-fade-in-up">
-                <div class="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                    </svg>
-                </div>
-                <h3 class="font-display text-2xl font-bold text-gray-950 mb-3">Reservasi Online Ditutup</h3>
-                <p class="text-gray-600 text-sm leading-relaxed mb-6">
-                    Mohon maaf, saat ini sistem reservasi online Amapiano Cafe sedang ditutup sementara oleh pengelola. Silakan hubungi layanan pelanggan kami melalui WhatsApp untuk info operasional langsung.
-                </p>
-                <a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl text-sm transition-all shadow-md">
-                    <i class="fab fa-whatsapp text-lg mr-2"></i> Hubungi Customer Service
-                </a>
-            </div>
-        @else
-            <!-- STEP PROGRESS INDICATOR -->
-        <div class="mb-8 animate-fade-in-up" style="animation-delay: 0.1s;">
-            <div class="flex items-center justify-center max-w-xl mx-auto">
-                <!-- Step 1 -->
-                <div class="flex flex-col items-center">
-                    <div id="step-circle-1" class="step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2 bg-amapiano-500 border-amapiano-500 text-white shadow-lg">
-                        <span id="step-num-1">1</span>
-                    </div>
-                    <p id="step-text-1" class="text-xs font-medium mt-1.5 text-amapiano-600">Tanggal & Waktu</p>
-                </div>
-                
-                <!-- Line -->
-                <div class="flex-1 mx-2 mb-6">
-                    <div id="line-1" class="h-1 rounded-full bg-gray-200 progress-line"></div>
-                </div>
-                
-                <!-- Step 2 -->
-                <div class="flex flex-col items-center">
-                    <div id="step-circle-2" class="step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2 bg-gray-100 border-gray-300 text-gray-400">
-                        <span id="step-num-2">2</span>
-                    </div>
-                    <p id="step-text-2" class="text-xs font-medium mt-1.5 text-gray-400">Pilih Ruangan</p>
-                </div>
-                
-                <!-- Line -->
-                <div class="flex-1 mx-2 mb-6">
-                    <div id="line-2" class="h-1 rounded-full bg-gray-200 progress-line"></div>
-                </div>
-                
-                <!-- Step 3 -->
-                <div class="flex flex-col items-center">
-                    <div id="step-circle-3" class="step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2 bg-gray-100 border-gray-300 text-gray-400">
-                        <span id="step-num-3">3</span>
-                    </div>
-                    <p id="step-text-3" class="text-xs font-medium mt-1.5 text-gray-400">Pilih Meja</p>
-                </div>
-                
-                <!-- Line -->
-                <div class="flex-1 mx-2 mb-6">
-                    <div id="line-3" class="h-1 rounded-full bg-gray-200 progress-line"></div>
-                </div>
-                
-                <!-- Step 4 -->
-                <div class="flex flex-col items-center">
-                    <div id="step-circle-4" class="step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2 bg-gray-100 border-gray-300 text-gray-400">
-                        <span id="step-num-4">4</span>
-                    </div>
-                    <p id="step-text-4" class="text-xs font-medium mt-1.5 text-gray-400">Data Pemesan</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- ============ STEP 1: Pilih Tanggal & Waktu ============ -->
-        <div id="content-step-1" class="step-content">
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                <div class="flex items-center space-x-3 mb-6">
-                    <div class="w-8 h-8 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg class="w-4 h-4 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                    </div>
-                    <div>
-                        <h3 class="font-display text-lg font-bold text-gray-900">Langkah 1: Tanggal & Waktu</h3>
-                        <p class="text-xs text-gray-500">Tentukan jadwal kunjungan Anda</p>
-                    </div>
-                </div>
-                
-                <div class="grid sm:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Tanggal <span class="text-red-500">*</span></label>
-                        <input type="date" id="input-date" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all bg-white" min="">
-                        <p class="text-xs text-red-500 mt-1 hidden" id="date-error">Reservasi minimal H-1</p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Waktu Kedatangan <span class="text-red-500">*</span></label>
-                        <select id="input-time" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all bg-white">
-                            <option value="">Pilih waktu</option>
-                            <option value="10:00">10:00 WIB</option>
-                            <option value="11:00">11:00 WIB</option>
-                            <option value="12:00">12:00 WIB</option>
-                            <option value="13:00">13:00 WIB</option>
-                            <option value="14:00">14:00 WIB</option>
-                            <option value="15:00">15:00 WIB</option>
-                            <option value="16:00">16:00 WIB</option>
-                            <option value="17:00">17:00 WIB</option>
-                            <option value="18:00">18:00 WIB</option>
-                            <option value="19:00">19:00 WIB</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="grid sm:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Jumlah Tamu <span class="text-red-500">*</span></label>
-                        <div class="flex items-center space-x-3">
-                            <button onclick="changeGuests(-1)" class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-amapiano-50 transition-all text-gray-600">−</button>
-                            <div class="flex-1 text-center">
-                                <span id="guest-count" class="text-2xl font-display font-bold text-amapiano-600">2</span>
-                                <p class="text-xs text-gray-500">orang</p>
+                <div class="reveal">
+                    <p class="font-script text-amapiano-500 text-2xl mb-3" id="about-subtitle">Cerita Kami</p>
+                    <h2 class="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-6" id="about-title">
+                        Tempat di Mana Rasa Bertemu Estetika
+                    </h2>
+                    <p class="text-gray-600 leading-relaxed mb-5" id="about-desc1">
+                        Amapiano Thematic Resto & Cafe hadir di kawasan Rich Village, Jember sebagai destinasi kuliner yang memadukan cita rasa Western dan Nusantara dalam suasana rustic yang memukau.
+                    </p>
+                    <p class="text-gray-600 leading-relaxed mb-8" id="about-desc2">
+                        Dengan desain interior bergaya Eropa yang dikelilingi taman hijau dan ikon kincir angin, kami menghadirkan pengalaman dining yang tak terlupakan. Setiap sudut cafe dirancang untuk menjadi latar sempurna bagi momen berharga Anda.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 gap-5 mb-8">
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
-                            <button onclick="changeGuests(1)" class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center hover:bg-amapiano-50 transition-all text-gray-600">+</button>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1.5">Info Min. Order</label>
-                        <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-center">
-                            <p class="text-xs text-amber-700" id="min-order-info">Pilih tanggal untuk melihat info</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <button onclick="goToStep(2)" class="btn-primary text-white w-full py-3 rounded-xl font-semibold text-sm">
-                    Lanjutkan →
-                </button>
-            </div>
-        </div>
-
-        <!-- ============ STEP 2: Pilih Ruangan ============ -->
-        <div id="content-step-2" class="step-content hidden">
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-display text-lg font-bold text-gray-900">Langkah 2: Pilih Ruangan</h3>
-                            <p class="text-xs text-gray-500">Pilih ruangan favorit Anda</p>
-                        </div>
-                    </div>
-                    <button onclick="goToStep(1)" class="text-xs text-gray-400 hover:text-amapiano-600 transition-colors flex items-center space-x-1">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        <span>Kembali</span>
-                    </button>
-                </div>
-                
-                <div class="grid sm:grid-cols-3 gap-4 mb-6">
-                    <!-- Hoof Barn -->
-                    <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('hoof-barn')" id="room-hoof-barn">
-                        <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/153a6de12-232b-4ec6-b928-ef5b7417ff4c.png" alt="Hoof Barn" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-2 left-2 right-2">
-                                <span class="bg-amber-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🏠 Rustic</span>
-                            </div>
-                            <div class="absolute top-2 right-2 room-check-mark hidden">
-                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow">
-                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 text-sm" id="feature-hours-title">Buka Setiap Hari</p>
+                                <p class="text-gray-500 text-xs" id="feature-hours-desc">10:00 - 20:00 WIB</p>
                             </div>
                         </div>
-                        <div class="p-3">
-                            <h4 class="font-display text-sm font-bold text-gray-900">Hoof Barn</h4>
-                            <p class="text-[10px] text-gray-500 mt-0.5 line-clamp-2">Suasana barn rustic dengan interior kayu dan dekorasi vintage</p>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                                <span class="text-[10px] text-green-600 font-semibold" id="hoof-barn-available">8 meja tersedia</span>
-                                <span class="text-[10px] text-red-500 font-semibold" id="hoof-barn-occupied">3 terisi</span>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 text-sm" id="feature-location-title">Rich Village</p>
+                                <p class="text-gray-500 text-xs" id="feature-location-desc">Jember, Jawa Timur</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 text-sm" id="feature-qr-title">QR Menu</p>
+                                <p class="text-gray-500 text-xs" id="feature-qr-desc">Pesan via scan QR</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <div class="w-10 h-10 bg-forest-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-5 h-5 text-forest-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                            </div>
+                            <div>
+                                <p class="font-semibold text-gray-900 text-sm" id="feature-payment-title">Bayar di Kasir</p>
+                                <p class="text-gray-500 text-xs" id="feature-payment-desc">Cash & Digital</p>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Covent Garden -->
-                    <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('covent-garden')" id="room-covent-garden">
-                        <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/13e6bc120-4d2e-41ae-bdad-8058b9dbe46d.png" alt="Covent Garden" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-2 left-2 right-2">
-                                <span class="bg-green-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🌿 Outdoor</span>
-                            </div>
-                            <div class="absolute top-2 right-2 room-check-mark hidden">
-                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow">
-                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="font-display text-sm font-bold text-gray-900">Covent Garden</h4>
-                            <p class="text-[10px] text-gray-500 mt-0.5 line-clamp-2">Area outdoor garden asri dengan taman hijau dan kincir angin</p>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                                <span class="text-[10px] text-green-600 font-semibold" id="covent-garden-available">10 meja tersedia</span>
-                                <span class="text-[10px] text-red-500 font-semibold" id="covent-garden-occupied">4 terisi</span>
-                            </div>
-                        </div>
+                    <a href="#galeri" class="btn-primary text-white px-8 py-3 rounded-full font-semibold inline-flex items-center space-x-2 shadow-md">
+                        <span id="about-cta">Jelajahi Menu Kami</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galeri" class="py-20 md:py-28 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-14 reveal">
+                <p class="font-script text-amapiano-500 text-2xl mb-3" id="gallery-subtitle">Suasana Kami</p>
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4" id="gallery-title">Galeri Amapiano</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto" id="gallery-desc">Setiap sudut Amapiano dirancang untuk menciptakan pengalaman visual yang memukau dan momen yang tak terlupakan.</p>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                <div class="gallery-item col-span-2 row-span-2 reveal">
+                    <img src="{{ asset('images/g1.png') }}" alt="Amapiano Exterior" class="w-full h-full object-cover min-h-[300px]">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g2.png') }}" alt="Interior" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g3.png') }}" alt="Outdoor" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g4.png') }}" alt="Decor" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g5.png') }}" alt="Aerial View" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g6.png') }}" alt="Sunset" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g7.png') }}" alt="Pathway" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g8.png') }}" alt="Entrance" class="w-full h-48 object-cover">
+                </div>
+                <div class="gallery-item reveal">
+                    <img src="{{ asset('images/g9.png') }}" alt="Garden" class="w-full h-48 object-cover">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Rules Section -->
+    <section id="aturan" class="m-0 p-0 w-full">
+        <div class="opt2 w-full m-0 p-0">
+            <div class="opt2-overlay"></div>
+            <div class="opt2-content">
+                <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div class="text-center mb-14 reveal">
+                        <p class="font-script text-forest-300 text-2xl mb-3" id="rules-subtitle">Peraturan Cafe</p>
+                        <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4" id="rules-title">Aturan & Kebijakan</h2>
+                        <p class="text-forest-200 max-w-2xl mx-auto" id="rules-desc">Mohon untuk mematuhi aturan yang berlaku demi kenyamanan bersama.</p>
                     </div>
                     
-                    <!-- Limburg -->
-                    <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('limburg')" id="room-limburg">
-                        <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/14fc7fd8c-30bc-4e73-a2e3-54c53769e1cb.png" alt="Limburg" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                            <div class="absolute bottom-2 left-2 right-2">
-                                <span class="bg-purple-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🏛️ Indoor</span>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 pb-8">
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-amapiano-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             </div>
-                            <div class="absolute top-2 right-2 room-check-mark hidden">
-                                <div class="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center shadow">
-                                    <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-3">
-                            <h4 class="font-display text-sm font-bold text-gray-900">Limburg</h4>
-                            <p class="text-[10px] text-gray-500 mt-0.5 line-clamp-2">Ruang indoor bergaya Eropa yang elegan dan privat</p>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-100">
-                                <span class="text-[10px] text-green-600 font-semibold" id="limburg-available">7 meja tersedia</span>
-                                <span class="text-[10px] text-red-500 font-semibold" id="limburg-occupied">3 terisi</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="selected-room-summary" class="hidden mb-4 bg-amapiano-50 rounded-lg p-3 flex items-center space-x-2">
-                    <svg class="w-4 h-4 text-amapiano-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    <p class="text-xs text-gray-700">Ruangan terpilih: <span id="selected-room-label" class="font-bold text-amapiano-600">-</span></p>
-                </div>
-                
-                <button onclick="goToStep(3)" class="btn-primary text-white w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed" id="btn-step2" disabled>
-                    Lanjutkan Pilih Meja →
-                </button>
-            </div>
-        </div>
-
-        <!-- ============ STEP 3: Pilih Meja ============ -->
-        <div id="content-step-3" class="step-content hidden">
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-display text-lg font-bold text-gray-900">Langkah 3: Pilih Meja</h3>
-                            <p class="text-xs text-gray-500" id="floorplan-room-name">-</p>
-                        </div>
-                    </div>
-                    <button onclick="goToStep(2)" class="text-xs text-gray-400 hover:text-amapiano-600 transition-colors">← Kembali</button>
-                </div>
-                
-                <!-- Legend -->
-                <div class="flex flex-wrap items-center gap-4 mb-4 bg-gray-50 rounded-lg p-2">
-                    <div class="flex items-center space-x-1.5">
-                        <div class="w-3.5 h-3.5 rounded bg-green-500 border border-green-600"></div>
-                        <span class="text-[10px] text-gray-600 font-medium">Tersedia</span>
-                    </div>
-                    <div class="flex items-center space-x-1.5">
-                        <div class="w-3.5 h-3.5 rounded bg-red-400 border border-red-500 opacity-60"></div>
-                        <span class="text-[10px] text-gray-600 font-medium">Terisi</span>
-                    </div>
-                    <div class="flex items-center space-x-1.5">
-                        <div class="w-3.5 h-3.5 rounded bg-amapiano-500 border border-amapiano-600"></div>
-                        <span class="text-[10px] text-gray-600 font-medium">Pilihan Anda</span>
-                    </div>
-                </div>
-                
-                <!-- Floor Plan -->
-                <div class="floor-plan-bg rounded-xl border border-gray-200 p-3 relative mb-4" id="floor-plan-wrapper" style="min-height: 350px;">
-                    <div id="floor-plan-label" class="absolute top-2 left-1/2 transform -translate-x-1/2 text-[9px] font-bold text-gray-400 uppercase tracking-widest">MAIN AREA</div>
-                    <div id="floor-plan-entrance" class="absolute bottom-0 left-1/2 transform -translate-x-1/2 bg-gray-300/80 px-4 py-1 rounded-t text-[10px] text-gray-600 font-semibold z-20"> ENTRANCE</div>
-                    <div id="tables-render-area" class="relative w-full" style="min-height: 310px;"></div>
-                </div>
-                
-                <!-- Selected Table Info -->
-                <div id="selected-table-info" class="hidden mb-4 bg-amapiano-50 rounded-lg p-3 flex items-center justify-between">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 bg-amapiano-500 rounded flex items-center justify-center flex-shrink-0">
-                            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                        </div>
-                        <div>
-                            <p class="text-xs text-gray-600"><span id="selected-tbl-name" class="font-bold text-amapiano-600">-</span></p>
-                            <p class="text-[10px] text-gray-500" id="selected-tbl-detail">-</p>
-                        </div>
-                    </div>
-                    <button onclick="clearTableSelection()" class="text-[10px] text-red-500 hover:text-red-600 font-medium">Hapus</button>
-                </div>
-                
-                <button onclick="goToStep(4)" class="btn-primary text-white w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed" id="btn-step3" disabled>
-                    Lanjutkan Isi Data →
-                </button>
-            </div>
-        </div>
-
-        <!-- ============ STEP 4: Data Pemesan ============ -->
-        <div id="content-step-4" class="step-content hidden">
-            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-amapiano-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <svg class="w-4 h-4 text-amapiano-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="font-display text-lg font-bold text-gray-900">Langkah 4: Data Pemesan</h3>
-                            <p class="text-xs text-gray-500">Lengkapi data untuk konfirmasi</p>
-                        </div>
-                    </div>
-                    <button onclick="goToStep(3)" class="text-xs text-gray-400 hover:text-amapiano-600 transition-colors">← Kembali</button>
-                </div>
-                
-                <!-- Booking Summary -->
-                <div class="bg-gray-50 rounded-xl p-4 mb-6">
-                    <p class="text-xs font-semibold text-gray-700 mb-2">Ringkasan Reservasi</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div class="flex justify-between"><span class="text-gray-500">Ruangan</span><span class="font-semibold text-gray-900" id="summary-room">-</span></div>
-                        <div class="flex justify-between"><span class="text-gray-500">Meja</span><span class="font-semibold text-gray-900" id="summary-table">-</span></div>
-                        <div class="flex justify-between"><span class="text-gray-500">Tanggal</span><span class="font-semibold text-gray-900" id="summary-date">-</span></div>
-                        <div class="flex justify-between"><span class="text-gray-500">Waktu</span><span class="font-semibold text-gray-900" id="summary-time">-</span></div>
-                        <div class="flex justify-between"><span class="text-gray-500">Tamu</span><span class="font-semibold text-gray-900" id="summary-guests">-</span></div>
-                    </div>
-                </div>
-                
-                <div class="space-y-4 mb-6">
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Lengkap <span class="text-red-500">*</span></label>
-                        <input type="text" id="input-name" placeholder="Masukkan nama lengkap" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nomor HP / WhatsApp <span class="text-red-500">*</span></label>
-                        <input type="tel" id="input-phone" placeholder="08xxxxxxxxxx" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Email (opsional)</label>
-                        <input type="email" id="input-email" placeholder="email@contoh.com" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Catatan Khusus (opsional)</label>
-                        <textarea id="input-notes" rows="2" placeholder="Contoh: meja dekat jendela, ada anak kecil, dll." class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm outline-none transition-all resize-none"></textarea>
-                    </div>
-                </div>
-                
-                <!-- Rules Acknowledgment -->
-                <div class="bg-gray-50 rounded-xl p-3 mb-6">
-                    <label class="flex items-start space-x-2 cursor-pointer">
-                        <input type="checkbox" id="rules-check" class="mt-0.5 w-4 h-4 text-amapiano-500 border-gray-300 rounded focus:ring-amapiano-500">
-                        <div class="text-[11px] text-gray-600">
-                            <p class="font-semibold text-gray-800">Saya menyetujui aturan cafe:</p>
-                            <ul class="mt-0.5 space-y-0.5 text-[10px]">
-                                <li>• Min. order: Rp 40.000 (weekday) / Rp 60.000 (weekend) per orang usia 14+</li>
-                                <li>• Denda Rp 100.000/item untuk bawa makanan/minuman luar</li>
-                                <li>• Dilarang membawa hewan peliharaan</li>
-                                <li>• Reservasi berlaku 2 jam dari waktu yang dipilih</li>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-minorder-title">Minimum Order</h3>
+                            <ul class="text-forest-200 text-sm space-y-2">
+                                <li>• Weekday: <span class="text-white font-semibold">Rp 40.000</span> (usia 14+)</li>
+                                <li>• Weekend/Hari Libur: <span class="text-white font-semibold">Rp 60.000</span></li>
+                                <li>• Anak di bawah 14 tahun: <span class="text-white font-semibold">Gratis deposit</span></li>
                             </ul>
                         </div>
-                    </label>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-red-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-outside-title">Makanan Luar</h3>
+                            <p class="text-forest-200 text-sm">Denda <span class="text-white font-semibold">Rp 100.000/item</span> untuk membawa makanan dan minuman dari luar.</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-pet-title">Hewan Peliharaan</h3>
+                            <p class="text-forest-200 text-sm">Dilarang membawa hewan peliharaan ke dalam area cafe.</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-camera-title">Kamera Profesional</h3>
+                            <p class="text-forest-200 text-sm">Biaya <span class="text-white font-semibold">Rp 750.000/kamera</span> maksimal 2 jam untuk kamera profesional/drone.</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-yellow-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-damage-title">Kerusakan Fasilitas</h3>
+                            <p class="text-forest-200 text-sm">Kerusakan fasilitas menjadi tanggung jawab pribadi pengunjung.</p>
+                        </div>
+                        
+                        <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20 reveal">
+                            <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mb-4">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <h3 class="font-display text-lg font-bold text-white mb-3" id="rule-reserve-title">Reservasi</h3>
+                            <ul class="text-forest-200 text-sm space-y-2">
+                                <li>• Wajib reservasi minimal <span class="text-white font-semibold">H-1</span></li>
+                                <li>• On the spot tidak dijamin dapat meja</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section id="testimoni" class="py-24 bg-amapiano-50 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amapiano-300 to-transparent"></div>
+        <div class="absolute -top-32 -right-32 w-96 h-96 bg-amapiano-100/60 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-forest-100/40 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-amapiano-100/30 rounded-full blur-3xl"></div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16 reveal">
+                <span class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-sm text-amapiano-700 px-5 py-2.5 rounded-full text-sm font-semibold mb-4 border border-amapiano-200/50 shadow-sm">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Ulasan Pelanggan
+                </span>
+                <h2 class="text-4xl md:text-5xl font-black mb-4 font-display text-gray-900">
+                    Apa Kata <span class="gradient-text">Mereka</span>
+                </h2>
+                <p class="text-gray-500 max-w-xl mx-auto text-base">Pengalaman nyata dari pengunjung yang sudah menikmati suasana dan cita rasa Amapiano.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 reveal">
+                <!-- Testimonial 1 -->
+                <div class="bg-white rounded-3xl p-8 relative border border-amapiano-100/60 shadow-sm card-hover">
+                    <div class="absolute -top-3 left-8 text-6xl text-amapiano-200/80 font-serif leading-none">"</div>
+                    <div class="flex gap-1 mb-5 mt-2">
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                    </div>
+                    <p class="text-gray-600 mb-8 leading-relaxed text-sm">"Tempatnya sangat estetik dan nyaman! Makanan enak-enak, terutama pasta dan kopinya. Cocok banget untuk nongkrong bareng teman atau keluarga. Pelayanannya juga ramah."</p>
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                        <div class="w-11 h-11 bg-gradient-to-br from-amapiano-400 to-amapiano-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">D</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Dewi Lestari</h4>
+                            <p class="text-xs text-amapiano-500">Jember</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="bg-white rounded-3xl p-8 relative border border-amapiano-100/60 shadow-sm card-hover">
+                    <div class="absolute -top-3 left-8 text-6xl text-forest-200/80 font-serif leading-none">"</div>
+                    <div class="flex gap-1 mb-5 mt-2">
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                    </div>
+                    <p class="text-gray-600 mb-8 leading-relaxed text-sm">"Suasana rustic-nya bikin betah berlama-lama. Kincir anginnya ikonik banget! Menu nusantaranya juga nggak kalah enak. Recommended place di Jember! 🌿"</p>
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                        <div class="w-11 h-11 bg-gradient-to-br from-forest-400 to-forest-600 rounded-full flex items-center justify-center text-white font-bold shadow-md">B</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Budi Santoso</h4>
+                            <p class="text-xs text-forest-500">Surabaya</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="bg-white rounded-3xl p-8 relative border border-amapiano-100/60 shadow-sm card-hover">
+                    <div class="absolute -top-3 left-8 text-6xl text-amapiano-200/80 font-serif leading-none">"</div>
+                    <div class="flex gap-1 mb-5 mt-2">
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                        <span class="text-amapiano-400 text-lg">★</span>
+                    </div>
+                    <p class="text-gray-600 mb-8 leading-relaxed text-sm">"Perfect spot untuk foto-foto! Setiap sudutnya instagramable. Makanannya juga delicious, especially the desserts. Pasti bakal balik lagi! 📸"</p>
+                    <div class="flex items-center gap-3 pt-4 border-t border-gray-100">
+                        <div class="w-11 h-11 bg-gradient-to-br from-amapiano-300 to-amapiano-500 rounded-full flex items-center justify-center text-white font-bold shadow-md">R</div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 text-sm">Rina Wijaya</h4>
+                            <p class="text-xs text-amapiano-500">Malang</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Section -->
+    <section id="lokasi" class="py-20 md:py-28 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="text-center mb-14 reveal">
+                <p class="font-script text-amapiano-500 text-2xl mb-3" id="location-subtitle">Temukan Kami</p>
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-gray-900 mb-4" id="location-title">Lokasi & Kontak</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto" id="location-desc">Kunjungi Amapiano Thematic Resto & Cafe di kawasan Rich Village, Jember.</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-10">
+                <!-- Map -->
+                <div class="reveal">
+                    <div class="rounded-2xl overflow-hidden shadow-xl h-[400px]">
+                        <iframe 
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d31688.58468988349!2d113.6866!3d-8.1735!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd695b7e5d3b3b3%3A0x3030c0c0c0c0c0c0!2sJember%2C%20Jawa%20Timur!5e0!3m2!1sid!2sid!4v1700000000000!5m2!1sid!2sid" 
+                            width="100%" 
+                            height="100%" 
+                            style="border:0;" 
+                            allowfullscreen="" 
+                            loading="lazy" 
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="rounded-2xl">
+                        </iframe>
+                    </div>
                 </div>
                 
-                <button onclick="confirmBooking()" class="btn-primary text-white w-full py-3 rounded-xl font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed" id="btn-step4" disabled>
-                    ✓ Konfirmasi Reservasi
-                </button>
+                <!-- Contact Info -->
+                <div class="reveal space-y-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-amapiano-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-gray-900 mb-1" id="contact-address-title">Alamat</h3>
+                                <p class="text-gray-600 text-sm" id="contact-address">Rich Village, Jember, Jawa Timur</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-forest-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-gray-900 mb-1" id="contact-hours-title">Jam Operasional</h3>
+                                <p class="text-gray-600 text-sm" id="contact-hours">Setiap Hari: 10:00 - 20:00 WIB</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-gray-900 mb-1" id="contact-wa-title">WhatsApp</h3>
+                                <p class="text-gray-600 text-sm mb-3" id="contact-wa">Reservasi & Pertanyaan</p>
+                                <a href="https://wa.me/6281542333979" target="_blank" class="inline-flex items-center space-x-2 bg-green-500 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-600 transition-colors shadow-sm">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                                    <span id="contact-wa-btn">Chat Sekarang</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md border border-gray-100">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-pink-500 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-gray-900 mb-1" id="contact-ig-title">Instagram</h3>
+                                <p class="text-gray-600 text-sm mb-2" id="contact-ig-desc">Follow untuk info terbaru</p>
+                                <a href="https://instagram.com/amapiano.cafe" target="_blank" class="text-pink-500 font-semibold text-sm hover:text-pink-600 transition-colors" id="contact-ig-link">@amapiano.cafe</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        @endif
-    </div>
+        </div>
+    </section>
 
-@push('scripts')
+    <!-- CTA Section -->
+    <section class="py-20 relative overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="{{ asset('images/g6.png') }}" alt="Amapiano Sunset" class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-amapiano-900/70"></div>
+        </div>
+        <div class="relative z-10 max-w-4xl mx-auto px-6 text-center reveal">
+            <p class="font-script text-amapiano-300 text-2xl mb-4" id="cta-subtitle">Jangan Lewatkan</p>
+            <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-6" id="cta-title">Kunjungi Kami Sekarang</h2>
+            <p class="text-white/80 text-lg mb-10 max-w-2xl mx-auto" id="cta-desc">Nikmati pengalaman dining yang tak terlupakan di Amapiano Thematic Resto & Cafe. Kami tunggu kehadiran Anda!</p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#lokasi" class="btn-primary text-white px-10 py-4 rounded-full text-lg font-semibold shadow-lg" id="cta-reserve-btn">
+                    Lihat Lokasi
+                </a>
+                <a href="https://wa.me/6281542333979" target="_blank" class="bg-green-500 text-white px-10 py-4 rounded-full text-lg font-semibold hover:bg-green-600 transition-all flex items-center space-x-2 shadow-lg" id="cta-wa-btn">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <span>Chat WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    @push('scripts')
     <script>
-        // ==================== STATE ====================
-        let currentStep = 1;
-        let guestCount = 2;
-        let selectedRoom = null;
-        let selectedTableId = null;
-        let countdownInterval = null;
-        
-        // ==================== ROOM DATA ====================
-        const rooms = {
-            'hoof-barn': {
-                name: 'Hoof Barn',
-                theme: '🏠 Rustic Barn',
-                totalTables: 8,
-                tables: [
-                    { id: 'HB-1', name: 'HB-1', capacity: 2, x: 8, y: 18, shape: 'round', size: 44, area: 'Dekat Jendela', occupied: false },
-                    { id: 'HB-2', name: 'HB-2', capacity: 4, x: 28, y: 14, shape: 'rect', size: 56, area: 'Tengah', occupied: false },
-                    { id: 'HB-3', name: 'HB-3', capacity: 4, x: 50, y: 18, shape: 'rect', size: 56, area: 'Tengah', occupied: true },
-                    { id: 'HB-4', name: 'HB-4', capacity: 6, x: 72, y: 14, shape: 'rect', size: 70, area: 'Dekat Dinding', occupied: false },
-                    { id: 'HB-5', name: 'HB-5', capacity: 2, x: 12, y: 48, shape: 'round', size: 44, area: 'Tengah', occupied: true },
-                    { id: 'HB-6', name: 'HB-6', capacity: 4, x: 35, y: 44, shape: 'rect', size: 56, area: 'Tengah', occupied: false },
-                    { id: 'HB-7', name: 'HB-7', capacity: 4, x: 60, y: 48, shape: 'rect', size: 56, area: 'Dekat Dinding', occupied: false },
-                    { id: 'HB-8', name: 'HB-8', capacity: 6, x: 45, y: 74, shape: 'rect', size: 70, area: 'Tengah', occupied: true },
-                ]
-            },
-            'covent-garden': {
-                name: 'Covent Garden',
-                theme: '🌿 Outdoor Garden',
-                totalTables: 10,
-                tables: [
-                    { id: 'CG-1', name: 'CG-1', capacity: 2, x: 6, y: 14, shape: 'round', size: 44, area: 'Area Garden', occupied: false },
-                    { id: 'CG-2', name: 'CG-2', capacity: 4, x: 22, y: 10, shape: 'rect', size: 56, area: 'Area Garden', occupied: false },
-                    { id: 'CG-3', name: 'CG-3', capacity: 4, x: 42, y: 14, shape: 'rect', size: 56, area: 'Area Garden', occupied: true },
-                    { id: 'CG-4', name: 'CG-4', capacity: 6, x: 64, y: 10, shape: 'rect', size: 70, area: 'Area Garden', occupied: false },
-                    { id: 'CG-5', name: 'CG-5', capacity: 2, x: 86, y: 16, shape: 'round', size: 44, area: 'Area Garden', occupied: false },
-                    { id: 'CG-6', name: 'CG-6', capacity: 4, x: 10, y: 40, shape: 'rect', size: 56, area: 'Dekat Kincir', occupied: false },
-                    { id: 'CG-7', name: 'CG-7', capacity: 4, x: 32, y: 36, shape: 'round', size: 52, area: 'Dekat Kincir', occupied: true },
-                    { id: 'CG-8', name: 'CG-8', capacity: 6, x: 55, y: 40, shape: 'rect', size: 70, area: 'Dekat Kincir', occupied: false },
-                    { id: 'CG-9', name: 'CG-9', capacity: 4, x: 78, y: 36, shape: 'rect', size: 56, area: 'Area Garden', occupied: false },
-                    { id: 'CG-10', name: 'CG-10', capacity: 8, x: 44, y: 70, shape: 'rect', size: 84, area: 'Tengah', occupied: true },
-                ]
-            },
-            'limburg': {
-                name: 'Limburg',
-                theme: '🏛️ European Indoor',
-                totalTables: 7,
-                tables: [
-                    { id: 'LB-1', name: 'LB-1', capacity: 2, x: 10, y: 18, shape: 'round', size: 44, area: 'Dekat Jendela', occupied: false },
-                    { id: 'LB-2', name: 'LB-2', capacity: 4, x: 30, y: 14, shape: 'rect', size: 56, area: 'Tengah', occupied: true },
-                    { id: 'LB-3', name: 'LB-3', capacity: 4, x: 52, y: 18, shape: 'rect', size: 56, area: 'Tengah', occupied: false },
-                    { id: 'LB-4', name: 'LB-4', capacity: 2, x: 76, y: 14, shape: 'round', size: 44, area: 'Dekat Dinding', occupied: false },
-                    { id: 'LB-5', name: 'LB-5', capacity: 6, x: 18, y: 44, shape: 'rect', size: 70, area: 'Tengah', occupied: false },
-                    { id: 'LB-6', name: 'LB-6', capacity: 4, x: 48, y: 42, shape: 'round', size: 52, area: 'Tengah', occupied: true },
-                    { id: 'LB-7', name: 'LB-7', capacity: 4, x: 72, y: 44, shape: 'rect', size: 56, area: 'Dekat Dinding', occupied: false },
-                ]
-            }
-        };
-        
-        // ==================== INIT ====================
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('input-date').min = tomorrow.toISOString().split('T')[0];
-        
-        document.getElementById('input-date').addEventListener('change', updateMinOrderInfo);
-        
-        // ==================== GUEST COUNT ====================
-        function changeGuests(d) {
-            guestCount = Math.max(1, Math.min(20, guestCount + d));
-            document.getElementById('guest-count').textContent = guestCount;
-        }
-        
-        // ==================== MIN ORDER INFO ====================
-        function updateMinOrderInfo() {
-            const val = document.getElementById('input-date').value;
-            const info = document.getElementById('min-order-info');
-            if (!val) { info.textContent = 'Pilih tanggal untuk melihat info'; return; }
-            const d = new Date(val);
-            const isWeekend = d.getDay() === 0 || d.getDay() === 6;
-            info.innerHTML = isWeekend 
-                ? 'Weekend/Hari Libur: <strong>Rp 60.000/orang</strong> (usia 14+)<br>Anak <14 th: Gratis'
-                : 'Weekday: <strong>Rp 40.000/orang</strong> (usia 14+)<br>Anak <14 th: Gratis';
-        }
-        
-        // ==================== STEP NAVIGATION ====================
-        function goToStep(step) {
-            // Validate before moving forward
-            if (step > currentStep) {
-                if (currentStep === 1) {
-                    const date = document.getElementById('input-date').value;
-                    const time = document.getElementById('input-time').value;
-                    if (!date || !time) { alert('Mohon isi tanggal dan waktu'); return; }
-                    const selDate = new Date(date);
-                    const today = new Date(); today.setHours(0,0,0,0);
-                    if (selDate <= today) { document.getElementById('date-error').classList.remove('hidden'); return; }
-                    document.getElementById('date-error').classList.add('hidden');
-                    updateRoomAvailability();
-                }
-                if (currentStep === 2 && !selectedRoom) { alert('Mohon pilih ruangan'); return; }
-                if (currentStep === 3 && !selectedTableId) { alert('Mohon pilih meja'); return; }
-            }
-            
-            // Hide all
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            
-            // Show target
-            const target = document.getElementById('content-step-' + step);
-            target.classList.remove('hidden');
-            target.style.opacity = '0'; target.style.transform = 'translateY(15px)';
-            requestAnimationFrame(() => {
-                target.style.transition = 'all 0.4s ease';
-                target.style.opacity = '1'; target.style.transform = 'translateY(0)';
-            });
-            
-            updateStepIndicators(step);
-            
-            if (step === 3) renderFloorPlan();
-            if (step === 4) updateSummary();
-            
-            currentStep = step;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        function updateStepIndicators(step) {
-            for (let i = 1; i <= 4; i++) {
-                const circle = document.getElementById('step-circle-' + i);
-                const num = document.getElementById('step-num-' + i);
-                const text = document.getElementById('step-text-' + i);
-                
-                circle.className = 'step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2';
-                
-                if (i < step) {
-                    circle.classList.add('bg-green-500', 'border-green-500', 'text-white', 'shadow-lg');
-                    num.innerHTML = '✓';
-                    text.className = 'text-xs font-medium mt-1.5 text-green-600';
-                } else if (i === step) {
-                    circle.classList.add('bg-amapiano-500', 'border-amapiano-500', 'text-white', 'shadow-lg');
-                    num.innerHTML = i;
-                    text.className = 'text-xs font-medium mt-1.5 text-amapiano-600';
-                } else {
-                    circle.classList.add('bg-gray-100', 'border-gray-300', 'text-gray-400');
-                    num.innerHTML = i;
-                    text.className = 'text-xs font-medium mt-1.5 text-gray-400';
-                }
-            }
-            
-            for (let i = 1; i <= 3; i++) {
-                const line = document.getElementById('line-' + i);
-                line.className = 'h-1 rounded-full progress-line ' + (step > i ? 'bg-green-500' : 'bg-gray-200');
-            }
-        }
-        
-        // ==================== ROOM AVAILABILITY ====================
-        function updateRoomAvailability() {
-            const date = document.getElementById('input-date').value;
-            const time = document.getElementById('input-time').value;
-
-            if (!date || !time) return;
-
-            fetch(`/reservations/booked?date=${date}&time=${time}`)
-            .then(response => response.json())
-            .then(bookedTableIds => {
-                Object.keys(rooms).forEach(roomKey => {
-                    const room = rooms[roomKey];
-                    let occupiedCount = 0;
-                    room.tables.forEach((t) => {
-                        t.occupied = bookedTableIds.includes(t.id.toLowerCase());
-                        if (t.occupied) occupiedCount++;
-                    });
-                    const avail = room.totalTables - occupiedCount;
-                    document.getElementById(roomKey + '-available').textContent = avail + ' meja tersedia';
-                    document.getElementById(roomKey + '-occupied').textContent = occupiedCount + ' terisi';
+        document.addEventListener("DOMContentLoaded", function () {
+            const reveals = document.querySelectorAll(".reveal, .scroll-reveal");
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target);
+                    }
                 });
-            })
-            .catch(err => {
-                console.error("Error loading table availability:", err);
+            }, { 
+                threshold: 0.15,
+                rootMargin: "0px 0px -50px 0px"
             });
-        }
-        
-        // ==================== ROOM SELECTION ====================
-        function selectRoom(roomId) {
-            selectedRoom = roomId;
-            selectedTableId = null;
-            
-            Object.keys(rooms).forEach(id => {
-                const card = document.getElementById('room-' + id);
-                const check = card.querySelector('.room-check-mark');
-                if (id === roomId) {
-                    card.classList.add('selected');
-                    card.style.borderColor = '#d88234';
-                    check.classList.remove('hidden');
-                } else {
-                    card.classList.remove('selected');
-                    card.style.borderColor = '#e5e7eb';
-                    check.classList.add('hidden');
-                }
-            });
-            
-            document.getElementById('selected-room-summary').classList.remove('hidden');
-            document.getElementById('selected-room-label').textContent = rooms[roomId].name + ' (' + rooms[roomId].theme + ')';
-            document.getElementById('btn-step2').disabled = false;
-        }
-        
-        // ==================== FLOOR PLAN ====================
-        function renderFloorPlan() {
-            const room = rooms[selectedRoom];
-            const area = document.getElementById('tables-render-area');
-            area.innerHTML = '';
-            
-            document.getElementById('floorplan-room-name').textContent = room.name + ' — ' + room.theme;
-            document.getElementById('floor-plan-label').textContent = room.name.toUpperCase() + ' AREA';
-            
-            // Add windmill decoration for Covent Garden
-            if (selectedRoom === 'covent-garden') {
-                const windmill = document.createElement('div');
-                windmill.innerHTML = '<svg class="w-12 h-12 text-gray-400/20" viewBox="0 0 100 100"><circle cx="50" cy="50" r="8" fill="currentColor"/><rect x="46" y="10" width="8" height="80" rx="2" fill="currentColor"/><rect x="10" y="46" width="80" height="8" rx="2" fill="currentColor"/></svg>';
-                windmill.style.cssText = 'position:absolute; top:8px; right:12px; pointer-events:none;';
-                area.appendChild(windmill);
-            }
-            
-            room.tables.forEach(table => {
-                const el = document.createElement('div');
-                const half = table.size / 2;
-                el.className = `table-seat absolute flex items-center justify-center ${table.occupied ? 'bg-red-400/70 border-red-500 cursor-not-allowed' : 'bg-green-500 border-green-600 cursor-pointer'} ${table.shape === 'round' ? 'rounded-full' : 'rounded-lg'} border-2`;
-                el.style.cssText = `left:${table.x}%; top:${table.y}%; width:${table.size}px; height:${table.size}px;`;
-                el.dataset.tableId = table.id;
-                
-                const lbl = document.createElement('span');
-                lbl.className = 'table-label';
-                lbl.textContent = table.name;
-                lbl.style.fontSize = table.size < 48 ? '9px' : '11px';
-                el.appendChild(lbl);
-                
-                const cap = document.createElement('span');
-                cap.style.cssText = 'position:absolute; bottom:-14px; left:50%; transform:translateX(-50%); font-size:8px; color:#6b7280; font-weight:600; white-space:nowrap; pointer-events:none;';
-                cap.textContent = '👤' + table.capacity;
-                el.appendChild(cap);
-                
-                if (!table.occupied) {
-                    el.onclick = () => pickTable(table.id);
-                    el.onmouseenter = (e) => showTableTooltip(table, e);
-                    el.onmouseleave = hideTableTooltip;
-                }
-                
-                area.appendChild(el);
-            });
-            
-            document.getElementById('selected-table-info').classList.add('hidden');
-            document.getElementById('btn-step3').disabled = true;
-            selectedTableId = null;
-        }
-        
-        function pickTable(tableId) {
-            selectedTableId = tableId;
-            const room = rooms[selectedRoom];
-            
-            document.querySelectorAll('.table-seat').forEach(el => {
-                const tid = el.dataset.tableId;
-                el.classList.remove('selected', 'bg-amapiano-500', 'border-amapiano-600');
-                const tbl = room.tables.find(t => t.id === tid);
-                if (tbl && !tbl.occupied) {
-                    if (tid === tableId) {
-                        el.classList.add('selected', 'bg-amapiano-500', 'border-amapiano-600');
-                    } else {
-                        el.classList.add('bg-green-500', 'border-green-600');
-                        el.classList.remove('bg-red-400/70', 'border-red-500');
-                    }
-                }
-            });
-            
-            const table = room.tables.find(t => t.id === tableId);
-            document.getElementById('selected-table-info').classList.remove('hidden');
-            document.getElementById('selected-tbl-name').textContent = table.name;
-            document.getElementById('selected-tbl-detail').textContent = `Kapasitas: ${table.capacity} orang • ${table.area}`;
-            document.getElementById('btn-step3').disabled = false;
-            
-            hideTableTooltip();
-        }
-        
-        function clearTableSelection() {
-            selectedTableId = null;
-            renderFloorPlan();
-        }
-        
-        // ==================== TABLE TOOLTIP ====================
-        let tooltipEl = null;
-        function showTableTooltip(table, event) {
-            if (tooltipEl) tooltipEl.remove();
-            
-            tooltipEl = document.createElement('div');
-            tooltipEl.style.cssText = 'position:absolute; background:white; border-radius:10px; padding:10px 14px; box-shadow:0 8px 30px rgba(0,0,0,0.15); z-index:50; font-size:11px; pointer-events:none; min-width:160px;';
-            
-            const status = table.occupied 
-                ? '<span class="text-red-500 font-semibold">Terisi</span>' 
-                : '<span class="text-green-500 font-semibold">Tersedia ✓</span>';
-            
-            tooltipEl.innerHTML = `
-                <p class="font-display font-bold text-gray-900 text-sm">${table.name}</p>
-                <p class="text-gray-500 mt-0.5">👤 ${table.capacity} orang • ${table.area}</p>
-                <p class="mt-1">Status: ${status}</p>
-            `;
-            
-            const wrapper = document.getElementById('floor-plan-wrapper');
-            const rect = wrapper.getBoundingClientRect();
-            let left = event.clientX - rect.left + 12;
-            let top = event.clientY - rect.top - 10;
-            if (left + 170 > rect.width) left = event.clientX - rect.left - 175;
-            if (top + 80 > rect.height) top = rect.height - 85;
-            if (top < 5) top = 5;
-            
-            tooltipEl.style.left = left + 'px';
-            tooltipEl.style.top = top + 'px';
-            wrapper.appendChild(tooltipEl);
-        }
-        
-        function hideTableTooltip() {
-            if (tooltipEl) { tooltipEl.remove(); tooltipEl = null; }
-        }
-        
-        // ==================== SUMMARY ====================
-        function updateSummary() {
-            const room = rooms[selectedRoom];
-            const table = room.tables.find(t => t.id === selectedTableId);
-            const date = document.getElementById('input-date').value;
-            const time = document.getElementById('input-time').value;
-            const dateObj = new Date(date);
-            const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            
-            document.getElementById('summary-room').textContent = room.name;
-            document.getElementById('summary-table').textContent = table.name;
-            document.getElementById('summary-date').textContent = dateObj.toLocaleDateString('id-ID', opts);
-            document.getElementById('summary-time').textContent = time + ' WIB';
-            document.getElementById('summary-guests').textContent = guestCount + ' orang';
-        }
-        
-        // ==================== CONFIRM BOOKING ====================
-        function confirmBooking() {
-            const name = document.getElementById('input-name').value.trim();
-            const phone = document.getElementById('input-phone').value.trim();
-            const rules = document.getElementById('rules-check').checked;
-            
-            if (!name || !phone) { alert('Mohon isi nama dan nomor HP'); return; }
-            if (!rules) { alert('Mohon centang persetujuan aturan'); return; }
-            
-            const room = rooms[selectedRoom];
-            const table = room.tables.find(t => t.id === selectedTableId);
-            const date = document.getElementById('input-date').value;
-            const time = document.getElementById('input-time').value;
-            const email = document.getElementById('input-email').value;
-            const notes = document.getElementById('input-notes').value;
-            const dateObj = new Date(date);
-            const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
-            let areaVal = 'Main Hall';
-            if (selectedRoom === 'covent-garden') areaVal = 'Terrace';
-            if (selectedRoom === 'limburg') areaVal = 'VIP Lounge';
-
-            const payload = {
-                fullname: name,
-                phone: phone,
-                date: date,
-                time: time,
-                area: areaVal,
-                table_id: selectedTableId.toLowerCase(),
-                guests: guestCount,
-                notes: notes
-            };
-
-            const btn = document.getElementById('btn-step4');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = 'Memproses...';
-
-            fetch('/reservations', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(payload)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw err; });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    // Fill ticket
-                    document.getElementById('ticket-booking-code').textContent = '#' + data.reservation.code;
-                    document.getElementById('ticket-room').textContent = room.name;
-                    document.getElementById('ticket-table').textContent = data.reservation.table_name;
-                    document.getElementById('ticket-date').textContent = dateObj.toLocaleDateString('id-ID', opts);
-                    document.getElementById('ticket-time').textContent = time + ' WIB';
-                    document.getElementById('ticket-name').textContent = name;
-                    document.getElementById('ticket-phone').textContent = phone;
-                    
-                    // Generate QR
-                    generateQR(data.reservation.code);
-                    
-                    // Show modal
-                    document.getElementById('success-modal').classList.remove('hidden');
-                    createConfetti();
-                    
-                    // Start countdown
-                    startCountdown();
-                } else {
-                    alert('Gagal membuat reservasi: ' + (data.message || 'Terjadi kesalahan'));
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert(err.message || 'Terjadi kesalahan saat menghubungi server. Silakan coba lagi.');
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            });
-        }
-        
-        // ==================== QR CODE GENERATOR ====================
-        function generateQR(data) {
-            const svg = document.getElementById('qr-code');
-            const size = 100;
-            const modules = 21;
-            const cellSize = size / modules;
-            
-            // Simple QR-like pattern based on data string
-            let hash = 0;
-            for (let i = 0; i < data.length; i++) {
-                hash = ((hash << 5) - hash) + data.charCodeAt(i);
-                hash |= 0;
-            }
-            
-            let svgContent = `<rect width="${size}" height="${size}" fill="white"/>`;
-            
-            // Generate deterministic pattern
-            const grid = [];
-            for (let r = 0; r < modules; r++) {
-                grid[r] = [];
-                for (let c = 0; c < modules; c++) {
-                    grid[r][c] = false;
-                }
-            }
-            
-            // Finder patterns (top-left, top-right, bottom-left)
-            function drawFinder(startR, startC) {
-                for (let r = -1; r <= 7; r++) {
-                    for (let c = -1; c <= 7; c++) {
-                        if (startR + r < 0 || startR + r >= modules || startC + c < 0 || startC + c >= modules) continue;
-                        const isOuter = (r === 0 || r === 6 || c === 0 || c === 6);
-                        const isInner = (r >= 2 && r <= 4 && c >= 2 && c <= 4);
-                        const isBorder = (r >= 0 && r <= 6 && c >= 0 && c <= 6);
-                        if (isOuter || isInner) {
-                            grid[startR + r][startC + c] = true;
-                        } else if (isBorder) {
-                            grid[startR + r][startC + c] = false;
-                        }
-                    }
-                }
-            }
-            
-            drawFinder(0, 0);
-            drawFinder(0, modules - 7);
-            drawFinder(modules - 7, 0);
-            
-            // Data pattern
-            for (let r = 0; r < modules; r++) {
-                for (let c = 0; c < modules; c++) {
-                    if (grid[r][c]) continue;
-                    // Check if in finder pattern area
-                    const inFinder1 = (r < 8 && c < 8);
-                    const inFinder2 = (r < 8 && c >= modules - 8);
-                    const inFinder3 = (r >= modules - 8 && c < 8);
-                    if (inFinder1 || inFinder2 || inFinder3) continue;
-                    
-                    const val = Math.abs((hash + r * 31 + c * 17 + r * c * 7) % 100);
-                    if (val < 55) grid[r][c] = true;
-                }
-            }
-            
-            // Timing patterns
-            for (let i = 8; i < modules - 8; i++) {
-                if (!grid[6][i]) grid[6][i] = i % 2 === 0;
-                if (!grid[i][6]) grid[i][6] = i % 2 === 0;
-            }
-            
-            for (let r = 0; r < modules; r++) {
-                for (let c = 0; c < modules; c++) {
-                    if (grid[r][c]) {
-                        svgContent += `<rect x="${c * cellSize}" y="${r * cellSize}" width="${cellSize + 0.5}" height="${cellSize + 0.5}" fill="#1f2937"/>`;
-                    }
-                }
-            }
-            
-            svg.innerHTML = svgContent;
-        }
-        
-        // ==================== COUNTDOWN ====================
-        function startCountdown() {
-            if (countdownInterval) clearInterval(countdownInterval);
-            
-            let totalSeconds = 2 * 60 * 60; // 2 hours
-            const maxSeconds = totalSeconds;
-            const startTime = Date.now();
-            
-            countdownInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const remaining = Math.max(0, totalSeconds - elapsed);
-                
-                const hours = Math.floor(remaining / 3600);
-                const minutes = Math.floor((remaining % 3600) / 60);
-                const seconds = remaining % 60;
-                
-                document.getElementById('countdown-text').textContent = 
-                    String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
-                
-                const pct = (remaining / maxSeconds) * 100;
-                document.getElementById('countdown-bar').style.width = pct + '%';
-                
-                if (remaining <= 0) {
-                    clearInterval(countdownInterval);
-                    document.getElementById('countdown-text').textContent = 'WAKTU HABIS';
-                    document.getElementById('countdown-text').classList.add('text-red-700');
-                }
-            }, 1000);
-        }
-        
-        // ==================== CONFETTI ====================
-        function createConfetti() {
-            const colors = ['#d88234', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#3b82f6'];
-            for (let i = 0; i < 60; i++) {
-                const piece = document.createElement('div');
-                piece.className = 'confetti-piece';
-                piece.style.left = Math.random() * 100 + 'vw';
-                piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                piece.style.animationDelay = Math.random() * 1.5 + 's';
-                piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                piece.style.width = (Math.random() * 8 + 5) + 'px';
-                piece.style.height = (Math.random() * 8 + 5) + 'px';
-                document.body.appendChild(piece);
-                setTimeout(() => piece.remove(), 4000);
-            }
-        }
-        
-        // ==================== RESET ====================
-        function resetAll() {
-            document.getElementById('success-modal').classList.add('hidden');
-            document.getElementById('input-date').value = '';
-            document.getElementById('input-time').value = '';
-            document.getElementById('input-name').value = '';
-            document.getElementById('input-phone').value = '';
-            document.getElementById('input-email').value = '';
-            document.getElementById('input-notes').value = '';
-            document.getElementById('rules-check').checked = false;
-            guestCount = 2;
-            document.getElementById('guest-count').textContent = '2';
-            selectedRoom = null;
-            selectedTableId = null;
-            
-            Object.keys(rooms).forEach(id => {
-                const card = document.getElementById('room-' + id);
-                card.classList.remove('selected');
-                card.style.borderColor = '#e5e7eb';
-                card.querySelector('.room-check-mark').classList.add('hidden');
-            });
-            
-            document.getElementById('selected-room-summary').classList.add('hidden');
-            document.getElementById('btn-step2').disabled = true;
-            document.getElementById('btn-step3').disabled = true;
-            document.getElementById('btn-step4').disabled = true;
-            document.getElementById('selected-table-info').classList.add('hidden');
-            document.getElementById('date-error').classList.add('hidden');
-            document.getElementById('min-order-info').textContent = 'Pilih tanggal untuk melihat info';
-            
-            document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
-            document.getElementById('content-step-1').classList.remove('hidden');
-            currentStep = 1;
-            updateStepIndicators(1);
-            
-            if (countdownInterval) clearInterval(countdownInterval);
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
-        // Enable/disable step 4 button
-        document.getElementById('input-name').addEventListener('input', checkStep4);
-        document.getElementById('input-phone').addEventListener('input', checkStep4);
-        document.getElementById('rules-check').addEventListener('change', checkStep4);
-        
-        function checkStep4() {
-            const name = document.getElementById('input-name').value.trim();
-            const phone = document.getElementById('input-phone').value.trim();
-            const rules = document.getElementById('rules-check').checked;
-            document.getElementById('btn-step4').disabled = !(name && phone && rules);
-        }
-        
-        // Close tooltip on click outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.table-seat') && tooltipEl) {
-                hideTableTooltip();
-            }
+            reveals.forEach(reveal => observer.observe(reveal));
         });
     </script>
-@endpush
-
-</div>
-
+    @endpush
 </x-layouts.app>
-
