@@ -25,14 +25,17 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
+            /** @var \App\Models\User|null $user */
+            $user = Auth::user();
+
             // Redirect based on role
-            if (Auth::user()->isAdmin()) {
-                return redirect()->intended('/admin/dashboard');
-            } elseif (Auth::user()->isStaff()) {
-                return redirect()->intended('/staff/dashboard');
+            if ($user && $user->isAdmin()) {
+                return redirect()->intended(route('admin.dashboard'));
+            } elseif ($user && $user->isStaff()) {
+                return redirect()->intended(route('staff.dashboard'));
             }
 
-            return redirect()->intended('/');
+            return redirect()->intended(route('home'));
         }
 
         throw ValidationException::withMessages([

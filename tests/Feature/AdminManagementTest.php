@@ -67,12 +67,16 @@ test('admin can update reservation status', function () {
 });
 
 test('bookings are rejected when store is closed', function () {
-    Cache::put('store_open', false);
+    
+    
+    // Create a closed operational date for the requested reservation date.
+    $closedDate = now()->addDays(2)->toDateString();
+    \App\Models\StoreOperationalDate::create(['date' => $closedDate, 'is_open' => false]);
 
     $response = $this->postJson('/reservations', [
         'fullname' => 'Bambang Sugiarto',
         'phone' => '082333900690',
-        'date' => now()->addDays(2)->toDateString(),
+        'date' => $closedDate,
         'time' => '11:00',
         'area' => 'Terrace',
         'table_id' => 'cg-3',
@@ -81,9 +85,7 @@ test('bookings are rejected when store is closed', function () {
 
     $response->assertStatus(422)
         ->assertJsonPath('success', false)
-        ->assertJsonPath('message', 'Reservasi online saat ini sedang ditutup.');
-
-    Cache::put('store_open', true); // restore status
+        ->assertJsonPath('message', 'Reservasi untuk tanggal tersebut ditutup oleh pengelola.');
 });
 
 test('admin cannot update status to checked_in for a future reservation', function () {

@@ -20,6 +20,11 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
+    <style>
+        /* Stabilkan ruang scrollbar untuk mencegah pergeseran layout */
+        html { scrollbar-gutter: stable; overflow-y: scroll; }
+    </style>
+
     @stack('styles')
 </head>
 <body class="bg-cream font-sans antialiased text-[#2B231D] min-h-screen flex flex-col justify-between">
