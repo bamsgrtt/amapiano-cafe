@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MenuItem;
+use App\Models\Promo;
 use App\Models\Reservation;
+use App\Models\StoreOperationalDate;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class AdminController extends Controller
 {
@@ -105,29 +109,16 @@ class AdminController extends Controller
         $users = User::whereIn('role', ['admin', 'staff'])->get();
 
         // 5. Store open status
-        $storeOpen = Cache::get('store_open', true);
+        $todaySchedule = StoreOperationalDate::where('date', today())->first();
+        $storeOpen = $todaySchedule ? $todaySchedule->is_open : true;
+        $storeOperationalDates = StoreOperationalDate::orderBy('date')->get();
 
-        // 6. Promos & Events
-        $promos = Cache::get('promos', [
-            [
-                'id' => 1,
-                'title' => 'Amapiano Jazz Night',
-                'type' => 'Event / Live Music',
-                'start' => now()->toDateString(),
-                'end' => now()->addDays(7)->toDateString(),
-                'description' => 'Setiap Jumat & Sabtu malam 19:00 - 22:00',
-                'status' => 'Aktif',
-            ],
-            [
-                'id' => 2,
-                'title' => 'Happy Hour Coffee',
-                'type' => 'Diskon',
-                'start' => now()->toDateString(),
-                'end' => now()->addDays(15)->toDateString(),
-                'description' => 'Diskon 20% untuk semua menu minuman.',
-                'status' => 'Aktif',
-            ],
-        ]);
+        // 6. Promos
+        $promoItems = Promo::where('type', '!=', 'Event / Live Music')->orderBy('start_date')->get();
+
+        // 7. Menu items
+        $menuItems = MenuItem::orderBy('category')->orderBy('name')->get();
+        $allMenuItems = MenuItem::orderBy('category')->orderBy('name')->get();
 
         return view('admin.dashboard', compact(
             'totalReservationsMonth',
@@ -142,7 +133,10 @@ class AdminController extends Controller
             'reservations',
             'users',
             'storeOpen',
-            'promos'
+            'storeOperationalDates',
+            'promoItems',
+            'menuItems',
+            'allMenuItems'
         ));
     }
 
@@ -184,48 +178,38 @@ class AdminController extends Controller
     }
 
     /**
-     * Store a new promo / event.
+     * Store a date-based operational rule.
      */
-    public function storePromo(Request $request)
+    public function storeOperationalDate(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'type' => 'required|string',
-            'start' => 'required|date',
-            'end' => 'required|date|after_or_equal:start',
-            'description' => 'nullable|string',
+            'start_date' => 'required|date|after_or_equal:today',
+            'end_date' => 'required|date|after_or_equal:start_date',
         ]);
 
-        $promos = Cache::get('promos', []);
-        $newPromo = [
-            'id' => count($promos) + 1,
-            'title' => $validated['title'],
-            'type' => $validated['type'],
-            'start' => $validated['start'],
-            'end' => $validated['end'],
-            'description' => $validated['description'] ?? '',
-            'status' => 'Aktif',
-        ];
+        $startDate = Carbon::parse($validated['start_date'])->startOfDay();
+        $endDate = Carbon::parse($validated['end_date'])->startOfDay();
 
-        $promos[] = $newPromo;
-        Cache::put('promos', $promos);
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+            StoreOperationalDate::updateOrCreate([
+                'date' => $date->toDateString(),
+            ], [
+                'is_open' => false,
+            ]);
+        }
 
-        return back()->with('success_promo', 'Promo / Event berhasil dipublikasikan.');
+        return back()->with('success_store_schedule', 'Cafe ditutup dari ' . $startDate->translatedFormat('d M Y') . ' hingga ' . $endDate->translatedFormat('d M Y') . '.');
     }
 
     /**
-     * Delete a promo/event by ID.
+     * Delete a date-based operational rule.
      */
-    public function deletePromo($id): RedirectResponse
+    public function deleteOperationalDate($id): RedirectResponse
     {
-        $promos = Cache::get('promos', []);
-        $promos = array_filter($promos, function ($p) use ($id) {
-            return $p['id'] != $id;
-        });
-        $promos = array_values($promos);
-        Cache::put('promos', $promos);
+        $schedule = StoreOperationalDate::findOrFail($id);
+        $schedule->delete();
 
-        return back()->with('success_promo', 'Promo / Event berhasil dihapus.');
+        return back()->with('success_store_schedule', 'Jadwal operasional berhasil dihapus.');
     }
 
     /**
@@ -272,5 +256,165 @@ class AdminController extends Controller
         $res->update($updateData);
 
         return back()->with('success_reservation', 'Status reservasi berhasil diperbarui.');
+    }
+
+    /**
+     * Store a new menu item.
+     */
+    public function storeMenuItem(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string|in:Western,Nusantara,Drinks,Desserts',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $menuItem = new MenuItem();
+        $menuItem->fill([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? '',
+            'price' => (int) $validated['price'],
+            'category' => $validated['category'],
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $menuItem->image_path = $request->file('photo')->store('menu_items', 'public');
+        }
+
+        $menuItem->save();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'menu-promo'])
+            ->with('success_menu', 'Menu berhasil ditambahkan.');
+    }
+
+    /**
+     * Update an existing menu item.
+     */
+    public function updateMenuItem(Request $request, $id)
+    {
+        $menuItem = MenuItem::findOrFail($id);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric|min:0',
+            'category' => 'required|string|in:Western,Nusantara,Drinks,Desserts',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $menuItem->fill([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? '',
+            'price' => (int) $validated['price'],
+            'category' => $validated['category'],
+        ]);
+
+        if ($request->hasFile('photo')) {
+            if ($menuItem->image_path) {
+                Storage::disk('public')->delete($menuItem->image_path);
+            }
+            $menuItem->image_path = $request->file('photo')->store('menu_items', 'public');
+        }
+
+        $menuItem->save();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'menu-promo'])
+            ->with('success_menu', 'Menu berhasil diperbarui.');
+    }
+
+    /**
+     * Delete a menu item.
+     */
+    public function deleteMenuItem($id): RedirectResponse
+    {
+        $menuItem = MenuItem::findOrFail($id);
+        if ($menuItem->image_path) {
+            Storage::disk('public')->delete($menuItem->image_path);
+        }
+        $menuItem->delete();
+
+        return redirect()->route('admin.dashboard', ['tab' => 'menu-promo'])
+            ->with('success_menu', 'Menu berhasil dihapus.');
+    }
+
+    /**
+     * Store a new promo or event.
+     */
+    public function storePromo(Request $request)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'type' => 'required|string',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
+            'description' => 'nullable|string',
+            'menu_items' => 'nullable|array',
+            'menu_items.*' => 'integer|exists:menu_items,id',
+        ]);
+
+        $promo = Promo::create([
+            'title' => $validated['title'],
+            'type' => $validated['type'],
+            'start_date' => $validated['start'],
+            'end_date' => $validated['end'],
+            'description' => $validated['description'] ?? '',
+            'status' => 'Aktif',
+        ]);
+
+        if ($validated['type'] !== 'Event / Live Music' && ! empty($validated['menu_items'])) {
+            $promo->menuItems()->sync($validated['menu_items']);
+        }
+
+        return back()->with('success_promo', 'Promo / Event berhasil dipublikasikan.');
+    }
+
+    /**
+     * Update an existing promo or event.
+     */
+    public function updatePromo(Request $request, $id)
+    {
+        $promo = Promo::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'type' => 'required|string',
+            'start' => 'required|date',
+            'end' => 'required|date|after_or_equal:start',
+            'description' => 'nullable|string',
+            'status' => 'required|string',
+            'menu_items' => 'nullable|array',
+            'menu_items.*' => 'integer|exists:menu_items,id',
+        ]);
+
+        $promo->update([
+            'title' => $validated['title'],
+            'type' => $validated['type'],
+            'start_date' => $validated['start'],
+            'end_date' => $validated['end'],
+            'description' => $validated['description'] ?? '',
+            'status' => $validated['status'],
+        ]);
+
+        if ($validated['type'] !== 'Event / Live Music') {
+            $promo->menuItems()->sync($validated['menu_items'] ?? []);
+        }
+
+        return back()->with('success_promo', 'Promo / Event berhasil diperbarui.');
+    }
+
+    /**
+     * Delete a promo/event by ID.
+     */
+    public function deletePromo($id): RedirectResponse
+    {
+        $promo = Promo::findOrFail($id);
+        if ($promo->image_path) {
+            Storage::disk('public')->delete($promo->image_path);
+        }
+        $promo->delete();
+
+        return back()->with('success_promo', 'Promo / Event berhasil dihapus.');
     }
 }

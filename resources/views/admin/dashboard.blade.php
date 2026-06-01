@@ -25,9 +25,9 @@
                     <i class="fas fa-chair w-6 text-center mr-3 group-hover:scale-110 transition-transform"></i>
                     Area & Meja
                 </a>
-                <a href="#" onclick="switchTab('promo-event')" id="nav-promo-event" class="sidebar-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-gray-600 transition-all group">
-                    <i class="fas fa-gift w-6 text-center mr-3 group-hover:scale-110 transition-transform"></i>
-                    Promo & Event
+                <a href="#" onclick="switchTab('menu-promo')" id="nav-menu-promo" class="sidebar-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-gray-600 transition-all group">
+                    <i class="fas fa-utensils w-6 text-center mr-3 group-hover:scale-110 transition-transform"></i>
+                    Menu & Promo
                 </a>
                 <a href="#" onclick="switchTab('users')" id="nav-users" class="sidebar-link flex items-center px-4 py-3 rounded-xl text-sm font-medium text-gray-600 transition-all group">
                     <i class="fas fa-users w-6 text-center mr-3 group-hover:scale-110 transition-transform"></i>
@@ -316,60 +316,108 @@
                     </div>
                 </div>
 
-                <!-- PROMO & EVENT TAB -->
-                <div id="tab-promo-event" class="tab-content hidden fade-in space-y-6">
+                <!-- MENU & PROMO TAB -->
+                <div id="tab-menu-promo" class="tab-content hidden fade-in space-y-6">
+                    @if(session('success_menu'))
+                        <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                            {{ session('success_menu') }}
+                        </div>
+                    @endif
                     @if(session('success_promo'))
                         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
                             {{ session('success_promo') }}
                         </div>
                     @endif
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-display text-lg font-bold text-gray-900">Promo & Event Aktif</h3>
-                        <button onclick="openModal('modal-add-promo')" class="bg-forest-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-forest-600 transition-all flex items-center shadow-md">
-                            <i class="fas fa-plus mr-2"></i> Buat Promo Baru
-                        </button>
-                    </div>
 
-                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        @foreach($promos as $promo)
-                            @if($promo['type'] === 'Event / Live Music')
-                                <div class="bg-gradient-to-br from-amapiano-500 to-amapiano-700 rounded-2xl p-6 text-white relative overflow-hidden shadow-lg">
-                                    <div class="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full transform translate-x-10 -translate-y-10"></div>
-                                    <div class="relative z-10">
-                                        <span class="bg-white/20 text-white text-xs font-bold px-2 py-1 rounded-lg backdrop-blur-sm">LIVE MUSIC</span>
-                                        <h4 class="font-display text-xl font-bold mt-3 mb-1">{{ $promo['title'] }}</h4>
-                                        <p class="text-amapiano-100 text-sm mb-4">{{ $promo['description'] }}</p>
-                                        <div class="flex items-center justify-between">
-                                            <span class="text-xs font-semibold bg-white/10 px-3 py-1 rounded-full"><i class="far fa-clock mr-1"></i> {{ \Carbon\Carbon::parse($promo['start'])->translatedFormat('d M') }} - {{ \Carbon\Carbon::parse($promo['end'])->translatedFormat('d M') }}</span>
-                                            <form action="{{ route('admin.promos.delete', $promo['id']) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus promo/event ini?')" class="inline">
+                    <div class="grid lg:grid-cols-2 gap-6">
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="font-display text-lg font-bold text-gray-900">Kelola Menu</h3>
+                                    <p class="text-sm text-gray-500">Tambahkan, edit, atau hapus daftar menu yang akan ditampilkan di halaman menu.</p>
+                                </div>
+                                <button onclick="openMenuModal()" class="bg-amapiano-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-amapiano-600 transition-all flex items-center shadow-md">
+                                    <i class="fas fa-plus mr-2"></i> Tambah Menu
+                                </button>
+                            </div>
+
+                            <div class="grid md:grid-cols-2 gap-4">
+                                @forelse($menuItems as $item)
+                                    <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all">
+                                        <div class="h-40 overflow-hidden bg-gray-100">
+                                            <img src="{{ $item->image_url }}" alt="{{ $item->name }}" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="p-4">
+                                            <div class="flex items-start justify-between gap-3 mb-3">
+                                                <span class="px-2.5 py-1 text-xs font-bold uppercase tracking-wide bg-amapiano-100 text-amapiano-700 rounded-full">{{ $item->category }}</span>
+                                                <span class="text-amapiano-600 font-bold">Rp {{ number_format($item->price, 0, ',', '.') }}</span>
+                                            </div>
+                                            <h4 class="font-display text-base font-bold text-gray-900">{{ $item->name }}</h4>
+                                            <p class="text-gray-500 text-sm mt-2">{{ $item->description }}</p>
+                                            <div class="mt-4 flex items-center gap-2">
+                                                <button type="button" onclick='openMenuModal({{ json_encode($item) }})' class="text-amapiano-600 text-xs font-semibold uppercase tracking-wide hover:text-amapiano-700">Edit</button>
+                                                <form action="{{ route('admin.menu-items.delete', $item->id) }}" method="POST" onsubmit="return confirm('Hapus item menu ini?')" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="text-red-500 text-xs font-semibold uppercase tracking-wide hover:text-red-700">Hapus</button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="col-span-2 p-6 rounded-2xl border border-dashed border-gray-200 text-center text-gray-500">
+                                        Belum ada item menu. Tambahkan menu baru untuk ditampilkan di halaman Menu.
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                            <div class="flex items-center justify-between mb-6">
+                                <div>
+                                    <h3 class="font-display text-lg font-bold text-gray-900">Kelola Promo</h3>
+                                    <p class="text-sm text-gray-500">Tambahkan tawaran promosi baru yang muncul di halaman menu.</p>
+                                </div>
+                                <button onclick="openPromoModal()" class="bg-forest-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-forest-600 transition-all flex items-center shadow-md">
+                                    <i class="fas fa-plus mr-2"></i> Tambah Promo
+                                </button>
+                            </div>
+
+                            <div class="grid gap-4">
+                                @forelse($promoItems as $promo)
+                                    <div class="rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-all">
+                                        <div class="flex items-center justify-between gap-3 mb-3">
+                                            <span class="text-xs font-bold uppercase tracking-wide bg-green-100 text-forest-600 px-2.5 py-1 rounded-full">{{ $promo->type }}</span>
+                                            <span class="text-sm text-gray-500">S/d {{ $promo->end_date->translatedFormat('d M Y') }}</span>
+                                        </div>
+                                        <h4 class="font-display text-base font-bold text-gray-900">{{ $promo->title }}</h4>
+                                        <p class="text-gray-500 text-sm mt-2">{{ $promo->description }}</p>
+                                        @if($promo->menuItems->isNotEmpty())
+                                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                                <p class="text-xs font-semibold text-gray-600 mb-2">Menu yang dapat promo:</p>
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach($promo->menuItems as $menuItem)
+                                                        <span class="text-xs bg-forest-50 text-forest-700 px-2 py-1 rounded-lg">{{ $menuItem->name }}</span>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @endif
+                                        <div class="mt-4 flex items-center gap-3">
+                                            <button type="button" onclick='openPromoModal({{ json_encode($promo->load("menuItems")) }})' class="text-amapiano-600 text-xs font-semibold uppercase tracking-wide hover:text-amapiano-700">Edit</button>
+                                            <form action="{{ route('admin.promos.delete', $promo->id) }}" method="POST" onsubmit="return confirm('Hapus promo ini?')" class="inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-white/70 hover:text-white text-xs font-semibold underline"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
+                                                <button type="submit" class="text-red-500 text-xs font-semibold uppercase tracking-wide hover:text-red-700">Hapus</button>
                                             </form>
                                         </div>
                                     </div>
-                                </div>
-                            @else
-                                <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md transition-all relative">
-                                    <div class="flex justify-between items-start">
-                                        <span class="bg-forest-100 text-forest-700 text-xs font-bold px-2 py-1 rounded-lg">{{ strtoupper($promo['type']) }}</span>
+                                @empty
+                                    <div class="p-6 rounded-2xl border border-dashed border-gray-200 text-center text-gray-500">
+                                        Belum ada promo aktif. Tambahkan promo agar pelanggan mendapat informasi terbaru.
                                     </div>
-                                    <h4 class="font-display text-lg font-bold text-gray-900 mt-3">{{ $promo['title'] }}</h4>
-                                    <p class="text-gray-500 text-sm mt-1 mb-4">{{ $promo['description'] }}</p>
-                                    <div class="flex items-center justify-between text-sm">
-                                        <span class="text-gray-400">Berlaku s/d {{ \Carbon\Carbon::parse($promo['end'])->translatedFormat('d M Y') }}</span>
-                                        <div class="flex items-center gap-3">
-                                            <span class="font-bold text-forest-600 mr-2">{{ $promo['status'] }}</span>
-                                            <form action="{{ route('admin.promos.delete', $promo['id']) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus promo/event ini?')" class="inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-semibold"><i class="fas fa-trash-alt mr-1"></i>Hapus</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -442,33 +490,234 @@
                 </div>
 
                 <!-- STORE STATUS TAB -->
-                <div id="tab-store-status" class="tab-content hidden fade-in space-y-6">
-                    <div class="max-w-2xl mx-auto">
-                        <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 text-center">
-                            <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 {{ $storeOpen ? 'bg-forest-100' : 'bg-red-100' }}" id="status-icon-container">
-                                <i class="fas fa-store text-4xl {{ $storeOpen ? 'text-forest-500' : 'text-red-500' }}" id="status-icon"></i>
-                            </div>
-                            <h3 class="font-display text-2xl font-bold text-gray-900 mb-2">Status Operasional Cafe</h3>
-                            <p class="text-gray-500 mb-8">Kontrol ketersediaan reservasi secara otomatis. Saat ditutup, pelanggan tidak dapat melakukan reservasi baru.</p>
-                            
-                            <div class="flex items-center justify-center gap-4 mb-8">
-                                <span class="font-bold text-gray-500">Tutup</span>
-                                <div class="relative inline-block w-14 mr-2 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" name="toggle" id="store-toggle" class="toggle-checkbox absolute block w-7 h-7 rounded-full bg-white border-4 border-gray-300 appearance-none cursor-pointer transition-all duration-300 left-0 checked:left-7 checked:border-forest-500" {{ $storeOpen ? 'checked' : '' }}/>
-                                    <label for="store-toggle" class="toggle-label block overflow-hidden h-7 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300 checked:bg-forest-500"></label>
+                <div id="tab-store-status" class="tab-content hidden fade-in space-y-8">
+                    
+                    <!-- Status Header Card -->
+                    <div class="relative overflow-hidden rounded-3xl shadow-lg border border-gray-100 bg-gradient-to-br {{ $storeOpen ? 'from-forest-50 to-emerald-50 via-white' : 'from-red-50 to-rose-50 via-white' }}">
+                        <div class="absolute top-0 right-0 -mt-8 -mr-8 w-40 h-40 rounded-full {{ $storeOpen ? 'bg-forest-100/50' : 'bg-red-100/50' }} blur-3xl"></div>
+                        <div class="absolute bottom-0 left-0 -mb-12 -ml-12 w-48 h-48 rounded-full {{ $storeOpen ? 'bg-forest-200/30' : 'bg-red-200/30' }} blur-3xl"></div>
+                        
+                        <div class="relative p-8 lg:p-10">
+                            <div class="flex flex-col lg:flex-row items-center lg:items-start gap-8">
+                                <!-- Status Icon -->
+                                <div class="flex-shrink-0">
+                                    <div class="relative">
+                                        <div class="absolute inset-0 rounded-full {{ $storeOpen ? 'bg-forest-400' : 'bg-red-400' }} animate-ping opacity-20"></div>
+                                        <div class="relative w-24 h-24 rounded-full {{ $storeOpen ? 'bg-gradient-to-br from-forest-400 to-forest-600' : 'bg-gradient-to-br from-red-400 to-red-600' }} flex items-center justify-center shadow-xl">
+                                            <i class="fas fa-store text-4xl text-white"></i>
+                                        </div>
+                                        <div class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center">
+                                            <div class="w-3 h-3 rounded-full {{ $storeOpen ? 'bg-forest-500' : 'bg-red-500' }} animate-pulse"></div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="font-bold text-gray-500">Buka</span>
-                            </div>
 
-                            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4 text-left flex items-start gap-3">
-                                <i class="fas fa-exclamation-triangle text-amber-500 mt-1"></i>
-                                <div>
-                                    <p class="text-sm font-bold text-amber-800">Mode Maintenance</p>
-                                    <p class="text-xs text-amber-700 mt-1">Jika cafe sedang libur atau renovasi, matikan status operasional. Reservasi yang sudah ada tetap berlaku.</p>
+                                <!-- Status Info -->
+                                <div class="flex-1 text-center lg:text-left">
+                                    <div class="inline-flex items-center px-4 py-1.5 rounded-full {{ $storeOpen ? 'bg-forest-100 text-forest-700' : 'bg-red-100 text-red-700' }} mb-4">
+                                        <span class="w-2 h-2 rounded-full {{ $storeOpen ? 'bg-forest-500' : 'bg-red-500' }} mr-2 animate-pulse"></span>
+                                        <span class="text-sm font-bold">{{ $storeOpen ? 'Cafe Sedang Buka' : 'Cafe Sedang Tutup' }}</span>
+                                    </div>
+                                    <h2 class="font-display text-3xl lg:text-4xl font-bold text-gray-900 mb-3">Status Operasional</h2>
+                                    <p class="text-gray-600 text-lg leading-relaxed max-w-xl mx-auto lg:mx-0">
+                                        Kelola jadwal operasional cafe. Reservasi otomatis dinonaktifkan saat cafe dalam status tutup.
+                                    </p>
+                                </div>
+
+                                <!-- Quick Stats -->
+                                <div class="flex flex-col sm:flex-row gap-3">
+                                    <div class="bg-white/80 backdrop-blur rounded-2xl px-6 py-4 shadow-sm border border-white/50 text-center">
+                                        <p class="text-xs text-gray-500 font-medium mb-1">Jadwal Khusus</p>
+                                        <p class="text-2xl font-display font-bold text-gray-900">{{ $storeOperationalDates->count() }}</p>
+                                    </div>
+                                    <div class="bg-white/80 backdrop-blur rounded-2xl px-6 py-4 shadow-sm border border-white/50 text-center">
+                                        <p class="text-xs text-gray-500 font-medium mb-1">Status Hari Ini</p>
+                                        <p class="text-2xl font-display font-bold {{ $storeOpen ? 'text-forest-600' : 'text-red-600' }}">{{ $storeOpen ? 'Buka' : 'Tutup' }}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Info Cards Grid -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <!-- Info Card -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="h-1.5 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
+                            <div class="p-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                                        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-display text-lg font-bold text-gray-900 mb-2">Pengaturan Jadwal</h4>
+                                        <p class="text-sm text-gray-600 leading-relaxed">
+                                            Status operasional ditentukan melalui jadwal tanggal khusus. Tambahkan tanggal untuk menutup atau membuka cafe pada hari tertentu.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Warning Card -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                            <div class="h-1.5 bg-gradient-to-r from-amber-400 to-orange-500"></div>
+                            <div class="p-6">
+                                <div class="flex items-start gap-4">
+                                    <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
+                                        <i class="fas fa-exclamation-triangle text-amber-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-display text-lg font-bold text-gray-900 mb-2">Mode Maintenance</h4>
+                                        <p class="text-sm text-gray-600 leading-relaxed">
+                                            Jika cafe sedang libur atau renovasi, atur jadwal tutup. Reservasi yang sudah dikonfirmasi tetap berlaku dan tidak terpengaruh.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Add Schedule Form -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-red-500 to-rose-500 p-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                                    <i class="fas fa-calendar-plus text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-display text-xl font-bold text-white">Tutup Cafe untuk Rentang Tanggal</h3>
+                                    <p class="text-white/80 text-sm mt-1">Pilih tanggal mulai dan selesai untuk menutup cafe secara otomatis</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 lg:p-8">
+                            @if(session('success_store_schedule'))
+                                <div class="mb-6 flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-xl">
+                                    <i class="fas fa-check-circle text-green-500 text-lg"></i>
+                                    <p class="text-sm text-green-700 font-medium">{{ session('success_store_schedule') }}</p>
+                                </div>
+                            @endif
+                            @if($errors->has('date') || $errors->has('status'))
+                                <div class="mb-6 flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+                                    <i class="fas fa-times-circle text-red-500 text-lg"></i>
+                                    <p class="text-sm text-red-700 font-medium">{{ $errors->first('date') ?: $errors->first('status') }}</p>
+                                </div>
+                            @endif
+
+                            <form action="{{ route('admin.store.schedule') }}" method="POST" class="space-y-6">
+                                @csrf
+                                <div class="grid md:grid-cols-2 gap-6">
+                                    <div class="space-y-3">
+                                        <label class="block text-sm font-semibold text-gray-700">
+                                            <i class="fas fa-calendar-alt text-red-400 mr-2"></i>Tanggal Mulai
+                                        </label>
+                                        <input type="date" name="start_date" class="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <label class="block text-sm font-semibold text-gray-700">
+                                            <i class="fas fa-calendar-check text-red-400 mr-2"></i>Tanggal Selesai
+                                        </label>
+                                        <input type="date" name="end_date" class="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
+                                    </div>
+                                </div>
+                                <div class="flex justify-end pt-2">
+                                    <button type="submit" class="inline-flex items-center px-8 py-3.5 bg-gradient-to-r from-red-500 to-rose-500 text-white rounded-xl font-bold hover:from-red-600 hover:to-rose-600 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                                        <i class="fas fa-lock mr-2"></i>
+                                        Tutup Cafe
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Schedule Table -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="p-6 lg:p-8 border-b border-gray-100">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-xl bg-forest-50 flex items-center justify-center">
+                                        <i class="fas fa-list-alt text-forest-500 text-xl"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-display text-xl font-bold text-gray-900">Jadwal Operasional Khusus</h3>
+                                        <p class="text-sm text-gray-500 mt-1">Daftar tanggal dengan pengaturan status khusus</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl">
+                                    <i class="fas fa-database text-gray-400 text-sm"></i>
+                                    <span class="text-sm font-semibold text-gray-600">Total: <span class="text-forest-600">{{ $storeOperationalDates->count() }}</span> jadwal</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                            <i class="fas fa-calendar text-gray-400 mr-2"></i>Tanggal
+                                        </th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                            <i class="fas fa-toggle-on text-gray-400 mr-2"></i>Status
+                                        </th>
+                                        <th class="px-6 py-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">
+                                            <i class="fas fa-cog text-gray-400 mr-2"></i>Aksi
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100">
+                                    @forelse($storeOperationalDates as $schedule)
+                                        <tr class="hover:bg-gray-50 transition-colors group">
+                                            <td class="px-6 py-5">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
+                                                        <i class="fas fa-calendar-day text-gray-500"></i>
+                                                    </div>
+                                                    <div>
+                                                        <p class="font-semibold text-gray-900">{{ $schedule->date->translatedFormat('d M Y') }}</p>
+                                                        <p class="text-xs text-gray-500 mt-0.5">{{ $schedule->date->diffForHumans() }}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5">
+                                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl {{ $schedule->is_open ? 'bg-forest-50 text-forest-700 border border-forest-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                                                    <div class="w-2 h-2 rounded-full {{ $schedule->is_open ? 'bg-forest-500' : 'bg-red-500' }} animate-pulse"></div>
+                                                    <span class="text-sm font-bold">{{ $schedule->status_label }}</span>
+                                                </div>
+                                            </td>
+                                            <td class="px-6 py-5 text-right">
+                                                <form action="{{ route('admin.store.schedule.delete', $schedule->id) }}" method="POST" onsubmit="return confirm('Hapus jadwal operasional tanggal ini?')" class="inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition-all group/delete">
+                                                        <i class="fas fa-trash-alt group-hover/delete:scale-110 transition-transform"></i>
+                                                        <span>Hapus</span>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3" class="px-6 py-16 text-center">
+                                                <div class="max-w-sm mx-auto">
+                                                    <div class="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                                        <i class="fas fa-calendar-xmark text-gray-400 text-3xl"></i>
+                                                    </div>
+                                                    <h4 class="font-display text-lg font-bold text-gray-700 mb-2">Belum ada jadwal</h4>
+                                                    <p class="text-sm text-gray-500 leading-relaxed">
+                                                        Tambahkan tanggal di atas untuk menutup atau membuka cafe secara khusus pada hari tertentu.
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
 
             </main>
@@ -513,20 +762,22 @@
     <!-- Modal Add Promo -->
     <div id="modal-add-promo" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
         <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-add-promo')"></div>
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md relative z-10 transform scale-95 transition-transform duration-200 p-6 m-4">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-display text-lg font-bold text-gray-900">Buat Promo / Event</h3>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl relative z-10 transform scale-95 transition-transform duration-200 p-6 m-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6 sticky top-0 bg-white">
+                <h3 class="font-display text-lg font-bold text-gray-900" id="promo-modal-title">Buat Promo / Event</h3>
                 <button onclick="closeModal('modal-add-promo')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-lg"></i></button>
             </div>
-            <form action="{{ route('admin.promos.store') }}" method="POST" class="space-y-4">
+            <form id="promo-form" action="{{ route('admin.promos.store') }}" method="POST" class="space-y-4">
                 @csrf
+                <input type="hidden" name="_method" value="POST" id="promo-form-method">
+                <input type="hidden" name="promo_id" id="promo-id">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Judul Promo</label>
-                    <input type="text" name="title" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" placeholder="Contoh: Weekend Special">
+                    <input type="text" name="title" id="promo-title" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" placeholder="Contoh: Weekend Special">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe</label>
-                    <select name="type" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
+                    <select name="type" id="promo-type" required onchange="togglePromoMenuItems()" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
                         <option value="Diskon">Diskon</option>
                         <option value="Event / Live Music">Event / Live Music</option>
                         <option value="Buy 1 Get 1">Buy 1 Get 1</option>
@@ -535,21 +786,93 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Mulai</label>
-                        <input type="date" name="start" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
+                        <input type="date" name="start" id="promo-start" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Selesai</label>
-                        <input type="date" name="end" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
+                        <input type="date" name="end" id="promo-end" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <select name="status" id="promo-status" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
+                        <option value="Aktif">Aktif</option>
+                        <option value="Tidak Aktif">Tidak Aktif</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
+                    <textarea name="description" id="promo-description" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" rows="3" placeholder="Deskripsi..."></textarea>
+                </div>
+
+                <!-- Menu Items Selection (hidden for events) -->
+                <div id="promo-menu-items-section" class="hidden space-y-3">
+                    <label class="block text-sm font-semibold text-gray-700">Pilih Menu yang Dapat Promo</label>
+                    <p class="text-xs text-gray-500 mb-3">Pilih menu mana saja yang akan mendapat promo ini:</p>
+                    <div id="promo-menu-items-list" class="border border-gray-200 rounded-xl max-h-48 overflow-y-auto p-3 space-y-2 bg-gray-50">
+                        @forelse($allMenuItems as $item)
+                            <label class="flex items-center p-2 hover:bg-white rounded-lg cursor-pointer transition-colors">
+                                <input type="checkbox" name="menu_items[]" value="{{ $item->id }}" class="menu-item-checkbox mr-3 w-4 h-4 text-forest-500 rounded">
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900">{{ $item->name }}</p>
+                                    <p class="text-xs text-gray-500">{{ $item->category }} • Rp {{ number_format($item->price, 0, ',', '.') }}</p>
+                                </div>
+                            </label>
+                        @empty
+                            <p class="text-sm text-gray-500 text-center py-4">Belum ada menu. Tambahkan menu terlebih dahulu.</p>
+                        @endforelse
+                    </div>
+                </div>
+
+                <button type="submit" id="promo-submit-button" class="w-full bg-forest-500 text-white py-3 rounded-xl font-bold hover:bg-forest-600 transition-colors">Publikasikan Promo</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Add Menu Item -->
+    <div id="modal-add-menu-item" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-add-menu-item')"></div>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md relative z-10 transform scale-95 transition-transform duration-200 p-6 m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-display text-lg font-bold text-gray-900" id="menu-modal-title">Tambah Menu Item</h3>
+                <button onclick="closeModal('modal-add-menu-item')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <form id="menu-form" action="{{ route('admin.menu-items.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                @csrf
+                <input type="hidden" name="_method" value="POST" id="menu-form-method">
+                <input type="hidden" name="menu_item_id" id="menu-item-id">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Menu</label>
+                    <input type="text" name="name" id="menu-name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amapiano-500 outline-none" placeholder="Contoh: Nasi Goreng Spesial">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
+                    <select name="category" id="menu-category" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amapiano-500 outline-none">
+                        <option value="Western">Western</option>
+                        <option value="Nusantara">Nusantara</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Desserts">Desserts</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Harga</label>
+                        <input type="number" name="price" id="menu-price" min="0" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amapiano-500 outline-none" placeholder="48000">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Foto</label>
+                        <input type="file" name="photo" id="menu-photo" accept="image/*" class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amapiano-50 file:text-amapiano-700 focus:outline-none">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
-                    <textarea name="description" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" rows="3" placeholder="Deskripsi..."></textarea>
+                    <textarea name="description" id="menu-description" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amapiano-500 outline-none" rows="3" placeholder="Deskripsi menu..."></textarea>
                 </div>
-                <button type="submit" class="w-full bg-forest-500 text-white py-3 rounded-xl font-bold hover:bg-forest-600 transition-colors">Publikasikan Promo</button>
+                <button type="submit" id="menu-submit-button" class="w-full bg-amapiano-500 text-white py-3 rounded-xl font-bold hover:bg-amapiano-600 transition-colors">Simpan Menu</button>
             </form>
         </div>
     </div>
+
 
     <script>
         // Tab Switching Logic
@@ -576,7 +899,7 @@
                 'dashboard': 'Dashboard Overview',
                 'reservasi': 'Manajemen Reservasi',
                 'area-meja': 'Area & Meja Cafe',
-                'promo-event': 'Promo & Event',
+                'menu-promo': 'Menu & Promo',
                 'users': 'Manajemen User',
                 'store-status': 'Status Operasional'
             };
@@ -613,45 +936,102 @@
             document.body.classList.remove('modal-active');
         }
 
-        // Store Status Toggle (AJAX)
-        const storeToggle = document.getElementById('store-toggle');
-        const statusBadgeContainer = document.getElementById('store-status-badge-container');
-        const statusBadge = document.getElementById('store-status-badge');
-        const statusText = document.getElementById('store-status-text');
-        const statusIconContainer = document.getElementById('status-icon-container');
-        const statusIcon = document.getElementById('status-icon');
+        function resetMenuForm() {
+            document.getElementById('menu-modal-title').textContent = 'Tambah Menu Item';
+            document.getElementById('menu-form').action = '{{ route('admin.menu-items.store') }}';
+            document.getElementById('menu-form-method').value = 'POST';
+            document.getElementById('menu-item-id').value = '';
+            document.getElementById('menu-name').value = '';
+            document.getElementById('menu-category').value = 'Western';
+            document.getElementById('menu-price').value = '';
+            document.getElementById('menu-description').value = '';
+            document.getElementById('menu-photo').value = '';
+            document.getElementById('menu-submit-button').textContent = 'Simpan Menu';
+        }
 
-        storeToggle.addEventListener('change', function() {
-            const isOpen = this.checked;
-            fetch('{{ route('admin.store.toggle') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ open: isOpen })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    if(isOpen) {
-                        statusBadgeContainer.className = 'hidden md:flex items-center bg-forest-100 px-3 py-1.5 rounded-full';
-                        statusBadge.className = 'w-2.5 h-2.5 rounded-full bg-forest-500 mr-2 animate-pulse';
-                        statusText.textContent = 'Buka';
-                        statusText.className = 'text-xs font-semibold text-forest-800';
-                        statusIconContainer.className = 'w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 bg-forest-100';
-                        statusIcon.className = 'fas fa-store text-4xl text-forest-500';
-                    } else {
-                        statusBadgeContainer.className = 'hidden md:flex items-center bg-red-100 px-3 py-1.5 rounded-full';
-                        statusBadge.className = 'w-2.5 h-2.5 rounded-full bg-red-500 mr-2 animate-pulse';
-                        statusText.textContent = 'Tutup';
-                        statusText.className = 'text-xs font-semibold text-red-800';
-                        statusIconContainer.className = 'w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-6 bg-red-100';
-                        statusIcon.className = 'fas fa-store text-4xl text-red-500';
-                    }
+        function openMenuModal(item = null) {
+            resetMenuForm();
+
+            if (item) {
+                document.getElementById('menu-modal-title').textContent = 'Edit Menu Item';
+                document.getElementById('menu-form').action = '/admin/menu-items/' + item.id;
+                document.getElementById('menu-form-method').value = 'PUT';
+                document.getElementById('menu-item-id').value = item.id;
+                document.getElementById('menu-name').value = item.name;
+                document.getElementById('menu-category').value = item.category;
+                document.getElementById('menu-price').value = item.price;
+                document.getElementById('menu-description').value = item.description;
+                document.getElementById('menu-submit-button').textContent = 'Perbarui Menu';
+            }
+
+            const modal = document.getElementById('modal-add-menu-item');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div.relative').classList.remove('scale-95');
+            modal.querySelector('div.relative').classList.add('scale-100');
+            document.body.classList.add('modal-active');
+        }
+
+        function resetPromoForm() {
+            document.getElementById('promo-modal-title').textContent = 'Tambah Promo';
+            document.getElementById('promo-form').action = '{{ route('admin.promos.store') }}';
+            document.getElementById('promo-form-method').value = 'POST';
+            document.getElementById('promo-id').value = '';
+            document.getElementById('promo-title').value = '';
+            document.getElementById('promo-type').value = 'Diskon';
+            document.getElementById('promo-start').value = '';
+            document.getElementById('promo-end').value = '';
+            document.getElementById('promo-status').value = 'Aktif';
+            document.getElementById('promo-description').value = '';
+            document.querySelectorAll('.menu-item-checkbox').forEach(cb => cb.checked = false);
+            document.getElementById('promo-submit-button').textContent = 'Publikasikan Promo';
+            togglePromoMenuItems();
+        }
+
+        function togglePromoMenuItems() {
+            const promoType = document.getElementById('promo-type').value;
+            const section = document.getElementById('promo-menu-items-section');
+            if (promoType === 'Event / Live Music') {
+                section.classList.add('hidden');
+                document.querySelectorAll('.menu-item-checkbox').forEach(cb => cb.checked = false);
+            } else {
+                section.classList.remove('hidden');
+            }
+        }
+
+        function openPromoModal(promo = null) {
+            resetPromoForm();
+
+            if (promo) {
+                document.getElementById('promo-modal-title').textContent = 'Edit Promo';
+                document.getElementById('promo-form').action = '/admin/promos/' + promo.id;
+                document.getElementById('promo-form-method').value = 'PUT';
+                document.getElementById('promo-id').value = promo.id;
+                document.getElementById('promo-title').value = promo.title;
+                document.getElementById('promo-type').value = promo.type;
+                document.getElementById('promo-start').value = promo.start_date ?? promo.start;
+                document.getElementById('promo-end').value = promo.end_date ?? promo.end;
+                document.getElementById('promo-status').value = promo.status ?? 'Aktif';
+                document.getElementById('promo-description').value = promo.description;
+                document.getElementById('promo-submit-button').textContent = 'Perbarui Promo';
+                
+                // Load associated menu items if promo has them
+                if (promo.menu_items && promo.menu_items.length > 0) {
+                    promo.menu_items.forEach(item => {
+                        const checkbox = document.querySelector(`input[value="${item.id}"]`);
+                        if (checkbox) checkbox.checked = true;
+                    });
                 }
-            });
-        });
+                
+                togglePromoMenuItems();
+            }
+
+            const modal = document.getElementById('modal-add-promo');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            modal.querySelector('div.relative').classList.remove('scale-95');
+            modal.querySelector('div.relative').classList.add('scale-100');
+            document.body.classList.add('modal-active');
+        }
+
 
         // Initialize Chart with dynamic database values
         document.addEventListener('DOMContentLoaded', function() {
@@ -707,3 +1087,4 @@
         });
     </script>
 </x-layouts.dashboard>
+

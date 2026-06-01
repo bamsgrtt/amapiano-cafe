@@ -7,6 +7,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Models\StoreOperationalDate;
 use Illuminate\Support\Facades\Cache;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,16 +34,6 @@ class ReservationController extends Controller
             'lb-1' => 'Table LB-1', 'lb-2' => 'Table LB-2', 'lb-3' => 'Table LB-3', 'lb-4' => 'Table LB-4', 'lb-5' => 'Table LB-5', 'lb-6' => 'Table LB-6', 'lb-7' => 'Table LB-7',
         ];
 
-        // Verify cafe operational status
-        if (! Cache::get('store_open', true)) {
-            $errorMsg = 'Reservasi online saat ini sedang ditutup.';
-            if ($request->expectsJson()) {
-                return response()->json(['success' => false, 'message' => $errorMsg], 422);
-            }
-
-            return back()->withErrors(['store' => $errorMsg])->withInput();
-        }
-
         // 2. Validate standard request inputs
         $validated = $request->validate([
             'fullname' => 'required|string|min:2|max:255',
@@ -54,6 +45,16 @@ class ReservationController extends Controller
             'guests' => 'required|integer|min:1|max:20',
             'notes' => 'nullable|string|max:1000',
         ]);
+
+        $schedule = StoreOperationalDate::where('date', $validated['date'])->first();
+        if ($schedule !== null && ! $schedule->is_open) {
+            $errorMsg = 'Reservasi untuk tanggal tersebut ditutup oleh pengelola.';
+            if ($request->expectsJson()) {
+                return response()->json(['success' => false, 'message' => $errorMsg], 422);
+            }
+
+            return back()->withErrors(['store' => $errorMsg])->withInput();
+        }
 
         $tableId = strtolower($validated['table_id']);
         $guests = (int) $validated['guests'];

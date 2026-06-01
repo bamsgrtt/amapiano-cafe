@@ -645,10 +645,13 @@
         const maxDay = String(maxDate.getDate()).padStart(2, '0');
         const maxDateStr = `${maxYear}-${maxMonth}-${maxDay}`;
 
+        const closedDates = @json($closedDates ?? []);
+
         document.getElementById('input-date').min = todayStr;
         document.getElementById('input-date').max = maxDateStr;
         
         document.getElementById('input-date').addEventListener('change', () => {
+            if (!validateSelectedDate()) return;
             updateMinOrderInfo();
             updateRoomAvailability();
         });
@@ -671,6 +674,29 @@
                 ? 'Weekend/Hari Libur: <strong>Rp 60.000/orang</strong> (usia 14+)<br>Anak <14 th: Gratis'
                 : 'Weekday: <strong>Rp 40.000/orang</strong> (usia 14+)<br>Anak <14 th: Gratis';
         }
+
+        function isClosedDate(date) {
+            return closedDates.includes(date);
+        }
+
+        function validateSelectedDate() {
+            const date = document.getElementById('input-date').value;
+            const errorEl = document.getElementById('date-error');
+
+            if (!date) {
+                errorEl.classList.add('hidden');
+                return true;
+            }
+
+            if (isClosedDate(date)) {
+                errorEl.textContent = 'Tanggal terpilih ditutup dan tidak dapat dipesan.';
+                errorEl.classList.remove('hidden');
+                return false;
+            }
+
+            errorEl.classList.add('hidden');
+            return true;
+        }
         
         // ==================== STEP NAVIGATION ====================
         function goToStep(step) {
@@ -689,6 +715,11 @@
 
                     if (date < nowTodayStr) {
                         document.getElementById('date-error').textContent = 'Reservasi minimal hari ini';
+                        document.getElementById('date-error').classList.remove('hidden');
+                        return;
+                    }
+                    if (isClosedDate(date)) {
+                        document.getElementById('date-error').textContent = 'Tanggal ini ditutup dan tidak dapat dipesan.';
                         document.getElementById('date-error').classList.remove('hidden');
                         return;
                     }
