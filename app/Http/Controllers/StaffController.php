@@ -146,7 +146,7 @@ class StaffController extends Controller
             ]);
         }
 
-        // Validate Date & Time
+        // --- VALIDASI TANGGAL & WAKTU (DISESUAIKAN DENGAN LOGIKA 2 JAM) ---
         $today = now()->timezone('Asia/Jakarta')->toDateString();
         if ($reservation->date !== $today) {
             return response()->json([
@@ -158,17 +158,34 @@ class StaffController extends Controller
 
         $bookingDateTime = Carbon::parse($reservation->date.' '.$reservation->time, 'Asia/Jakarta');
         $now = now()->timezone('Asia/Jakarta');
-        if ($now->lt($bookingDateTime)) {
+        
+        // Batas awal: 2 jam sebelum waktu reservasi
+        $earliestCheckInTime = $bookingDateTime->copy()->subHours(2);
+        // Batas akhir: 2 jam setelah waktu reservasi
+        $latestCheckInTime = $bookingDateTime->copy()->addHours(2);
+
+        // Cek jika TERLALU AWAL
+        if ($now->lt($earliestCheckInTime)) {
+            $formattedLimit = $earliestCheckInTime->format('H:i');
             return response()->json([
                 'valid' => false,
                 'status' => 'invalid_datetime',
-                'message' => 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.',
+                'message' => "Terlalu awal. Check-in hanya bisa dilakukan mulai 2 jam sebelum waktu reservasi (pukul {$formattedLimit}).",
             ]);
         }
 
-        // Check if user is late (more than 15 minutes past scheduled time)
-        $late = false;
+        // Cek jika TERLALU TELAT (Waktu sewa sudah habis)
+        if ($now->gt($latestCheckInTime)) {
+            $formattedLateLimit = $latestCheckInTime->format('H:i');
+            return response()->json([
+                'valid' => false,
+                'status' => 'invalid_datetime',
+                'message' => "Waktu sewa sudah habis. Maksimal check-in adalah 2 jam setelah waktu reservasi (pukul {$formattedLateLimit}). Silakan buat reservasi baru.",
+            ]);
+        }
 
+        // Cek jika user telat lebih dari 15 menit dari jadwal asli (opsional, untuk info UI)
+        $late = false;
         if ($now->greaterThan($bookingDateTime->copy()->addMinutes(15))) {
             $late = true;
         }
@@ -212,7 +229,7 @@ class StaffController extends Controller
             ]);
         }
 
-        // Validate Date & Time
+        // --- VALIDASI TANGGAL & WAKTU (DISESUAIKAN DENGAN LOGIKA 2 JAM) ---
         $today = now()->timezone('Asia/Jakarta')->toDateString();
         if ($reservation->date !== $today) {
             return response()->json([
@@ -223,10 +240,27 @@ class StaffController extends Controller
 
         $bookingDateTime = Carbon::parse($reservation->date.' '.$reservation->time, 'Asia/Jakarta');
         $now = now()->timezone('Asia/Jakarta');
-        if ($now->lt($bookingDateTime)) {
+
+        // Batas awal: 2 jam sebelum waktu reservasi
+        $earliestCheckInTime = $bookingDateTime->copy()->subHours(2);
+        // Batas akhir: 2 jam setelah waktu reservasi
+        $latestCheckInTime = $bookingDateTime->copy()->addHours(2);
+
+        // Cek jika TERLALU AWAL
+        if ($now->lt($earliestCheckInTime)) {
+            $formattedLimit = $earliestCheckInTime->format('H:i');
             return response()->json([
                 'success' => false,
-                'message' => 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.',
+                'message' => "Terlalu awal. Check-in hanya bisa dilakukan mulai 2 jam sebelum waktu reservasi (pukul {$formattedLimit}).",
+            ]);
+        }
+
+        // Cek jika TERLALU TELAT (Waktu sewa sudah habis)
+        if ($now->gt($latestCheckInTime)) {
+            $formattedLateLimit = $latestCheckInTime->format('H:i');
+            return response()->json([
+                'success' => false,
+                'message' => "Waktu sewa sudah habis. Maksimal check-in adalah 2 jam setelah waktu reservasi (pukul {$formattedLateLimit}). Silakan buat reservasi baru.",
             ]);
         }
 

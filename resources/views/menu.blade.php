@@ -1,4 +1,5 @@
 <x-layouts.app title="Halaman Beranda">
+    
 
 @push('styles')
     <!-- Konfigurasi Runtime Tailwind (JavaScript) -->
@@ -193,27 +194,35 @@
                 <p class="text-gray-600 max-w-2xl mx-auto" id="menu-desc">Perpaduan sempurna antara cita rasa Western dan Nusantara yang disajikan dengan penuh cinta dan kreativitas.</p>
             </div>
             
-            @php
-                $menuCategories = [
-                    'Western' => '🍝 Western',
-                    'Nusantara' => '🍛 Nusantara',
-                    'Drinks' => '☕ Minuman',
-                    'Desserts' => '🍰 Dessert',
-                ];
-                $groupedMenuItems = $menuItems->groupBy('category');
-            @endphp
-
+                        <!-- TABS KATEGORI DINAMIS -->
             <div class="flex justify-center mb-12 scroll-reveal">
-                <div class="inline-flex bg-white rounded-full p-1.5 shadow-md">
-                    @foreach($menuCategories as $key => $label)
-                        <button class="menu-tab {{ $loop->first ? 'active' : 'text-gray-600' }} px-6 py-2.5 rounded-full text-sm font-semibold transition-all" onclick="switchMenuTab('{{ strtolower($key) }}')" id="tab-{{ strtolower($key) }}">{{ $label }}</button>
+                <div class="inline-flex bg-white rounded-full p-1.5 shadow-md flex-wrap justify-center gap-1">
+                    @foreach($categories as $category)
+                        @php
+                            // Membuat ID yang aman (huruf kecil, spasi diganti strip)
+                            // Contoh: "Makanan Berat" menjadi "makanan-berat"
+                            $categoryId = strtolower(str_replace(' ', '-', $category->name));
+                        @endphp
+                        <button 
+                            class="menu-tab {{ $loop->first ? 'active' : 'text-gray-600' }} px-6 py-2.5 rounded-full text-sm font-semibold transition-all" 
+                            onclick="switchMenuTab('{{ $categoryId }}')" 
+                            id="tab-{{ $categoryId }}">
+                            {{ $category->name }}
+                        </button>
                     @endforeach
                 </div>
             </div>
 
-            @foreach($menuCategories as $key => $label)
-                <div id="menu-{{ strtolower($key) }}" class="menu-content {{ $loop->first ? '' : 'hidden' }} grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    @forelse($groupedMenuItems->get($key, collect()) as $item)
+            <!-- KONTEN MENU PER KATEGORI -->
+            @foreach($categories as $category)
+                @php
+                    $categoryId = strtolower(str_replace(' ', '-', $category->name));
+                    // Filter menu items yang kategorinya cocok dengan kategori saat ini
+                    $itemsInCategory = $menuItems->where('category', $category->name);
+                @endphp
+                
+                <div id="menu-{{ $categoryId }}" class="menu-content {{ $loop->first ? '' : 'hidden' }} grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @forelse($itemsInCategory as $item)
                         <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md {{ $item->promos->isNotEmpty() ? 'ring-1 ring-amapiano-200 border border-amapiano-100' : '' }}">
                             <div class="h-48 overflow-hidden bg-gray-100">
                                 <img src="{{ $item->image_url }}" alt="{{ $item->name }}" class="w-full h-full object-cover">
@@ -223,7 +232,7 @@
                                     <div class="mb-4 flex flex-col gap-2">
                                         <span class="inline-flex items-center rounded-full bg-gradient-to-r from-amapiano-500 to-forest-500 px-3 py-1 text-[11px] uppercase tracking-[0.24em] font-bold text-white shadow-lg">Promo</span>
                                         <div class="rounded-2xl bg-amapiano-50 border border-amapiano-100 px-4 py-3">
-                                            <p class="text-xs uppercase tracking-[0.2em] text-amapiano-700 font-semibold">Nama Promo</p>
+                                            <p class="text-xs uppercase tracking-[0.2em] text-amapiano-700 font-semibold">Promo Berlaku</p>
                                             <p class="mt-1 text-sm font-semibold text-gray-900">{{ $item->promos->pluck('title')->join(' • ') }}</p>
                                         </div>
                                     </div>
@@ -237,7 +246,7 @@
                         </div>
                     @empty
                         <div class="col-span-3 p-8 rounded-3xl border border-dashed border-gray-200 text-center text-gray-500">
-                            Belum ada menu kategori {{ strtolower($key) }}. Tambahkan menu baru di admin untuk menampilkan di sini.
+                            Belum ada menu di kategori <strong>{{ $category->name }}</strong>. Admin dapat menambahkannya melalui dashboard.
                         </div>
                     @endforelse
                 </div>

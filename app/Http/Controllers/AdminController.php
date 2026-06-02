@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\MenuItem;
 use App\Models\Promo;
 use App\Models\Reservation;
@@ -113,13 +114,15 @@ class AdminController extends Controller
         $storeOpen = $todaySchedule ? $todaySchedule->is_open : true;
         $storeOperationalDates = StoreOperationalDate::orderBy('date')->get();
 
-        // 6. Promos
+                // 6. Promos
         $promoItems = Promo::where('type', '!=', 'Event / Live Music')->orderBy('start_date')->get();
 
-        // 7. Menu items
+        // 7. Categories & Menu items (DITAMBAHKAN)
+        $categories = Category::orderBy('name')->get(); // <--- AMBIL DATA KATEGORI
         $menuItems = MenuItem::orderBy('category')->orderBy('name')->get();
         $allMenuItems = MenuItem::orderBy('category')->orderBy('name')->get();
 
+        // TAMBAHKAN 'categories' DI DALAM COMPACT
         return view('admin.dashboard', compact(
             'totalReservationsMonth',
             'checkinsToday',
@@ -136,7 +139,8 @@ class AdminController extends Controller
             'storeOperationalDates',
             'promoItems',
             'menuItems',
-            'allMenuItems'
+            'allMenuItems',
+            'categories' // <--- JANGAN LUPA TAMBAHKAN INI
         ));
     }
 
@@ -230,6 +234,12 @@ class AdminController extends Controller
     /**
      * Update reservation status directly from admin panel.
      */
+       /**
+     * Update reservation status directly from admin panel.
+     */
+      /**
+     * Update reservation status directly from admin panel.
+     */
     public function updateReservationStatus(Request $request, $id): RedirectResponse
     {
         $validated = $request->validate([
@@ -238,21 +248,39 @@ class AdminController extends Controller
 
         $res = Reservation::findOrFail($id);
         $updateData = ['status' => $validated['status']];
+        
         if ($validated['status'] === 'checked_in') {
-            // Validate Date & Time
+            // 1. Validasi Tanggal (HARUS hari ini)
             $today = now()->timezone('Asia/Jakarta')->toDateString();
             if ($res->date !== $today) {
                 return back()->with('error_reservation', 'Tidak dapat melakukan check-in: Tanggal reservasi tidak sesuai (harus hari ini).');
             }
 
+            // 2. Validasi Waktu (Sewa 2 Jam: Maksimal datang 2 jam sebelum, dan maksimal telat 2 jam)
             $bookingDateTime = Carbon::parse($res->date.' '.$res->time, 'Asia/Jakarta');
             $now = now()->timezone('Asia/Jakarta');
-            if ($now->lt($bookingDateTime)) {
-                return back()->with('error_reservation', 'Tidak dapat melakukan check-in: Waktu reservasi belum tiba.');
+            
+            // Batas awal: 2 jam sebelum waktu reservasi (Misal booking 19:00, boleh masuk dari 17:00)
+            $earliestCheckInTime = $bookingDateTime->copy()->subHours(2); 
+            
+            // Batas akhir: Tepat 2 jam setelah waktu reservasi / waktu sewa habis (Misal booking 19:00, maksimal masuk jam 21:00)
+            $latestCheckInTime = $bookingDateTime->copy()->addHours(2);   
+
+            // Cek jika TERLALU AWAL
+            if ($now->lt($earliestCheckInTime)) {
+                $formattedLimit = $earliestCheckInTime->format('H:i');
+                return back()->with('error_reservation', "Terlalu awal. Check-in hanya bisa dilakukan mulai 2 jam sebelum waktu reservasi (pukul {$formattedLimit}).");
+            }
+
+            // Cek jika TERLALU TELAT (Waktu sewa sudah habis)
+            if ($now->gt($latestCheckInTime)) {
+                $formattedLateLimit = $latestCheckInTime->format('H:i');
+                return back()->with('error_reservation', "Waktu sewa sudah habis. Maksimal check-in adalah 2 jam setelah waktu reservasi (pukul {$formattedLateLimit}). Silakan buat reservasi baru.");
             }
 
             $updateData['checked_in_at'] = now();
         }
+        
         $res->update($updateData);
 
         return back()->with('success_reservation', 'Status reservasi berhasil diperbarui.');
@@ -267,7 +295,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|in:Western,Nusantara,Drinks,Desserts',
+            'category' => 'required|string', // <-- DIUBAH: Hapus 'in:Western,...' agar bisa menerima kategori dinamis
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -292,7 +320,7 @@ class AdminController extends Controller
     /**
      * Update an existing menu item.
      */
-    public function updateMenuItem(Request $request, $id)
+       public function updateMenuItem(Request $request, $id)
     {
         $menuItem = MenuItem::findOrFail($id);
 
@@ -300,7 +328,7 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
-            'category' => 'required|string|in:Western,Nusantara,Drinks,Desserts',
+            'category' => 'required|string', // <-- DIUBAH: Hapus 'in:Western,...' di sini juga
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
@@ -323,7 +351,6 @@ class AdminController extends Controller
         return redirect()->route('admin.dashboard', ['tab' => 'menu-promo'])
             ->with('success_menu', 'Menu berhasil diperbarui.');
     }
-
     /**
      * Delete a menu item.
      */
@@ -339,33 +366,65 @@ class AdminController extends Controller
             ->with('success_menu', 'Menu berhasil dihapus.');
     }
 
+        /**
+     * Store a new menu category.
+     */
+    public function storeCategory(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255|unique:categories,name',
+        ]);
+
+        \App\Models\Category::create([
+            'name' => ucfirst(strtolower($validated['name'])), // Format huruf kapital di awal
+        ]);
+
+        return back()->with('success_category', 'Kategori berhasil ditambahkan.');
+    }
+
+    /**
+     * Delete a menu category.
+     */
+    public function deleteCategory($id)
+    {
+        $category = \App\Models\Category::findOrFail($id);
+        
+        // Opsional: Cek apakah ada menu yang memakai kategori ini
+        $menuCount = \App\Models\MenuItem::where('category', $category->name)->count();
+        if ($menuCount > 0) {
+            return back()->with('error_category', "Gagal menghapus: Ada {$menuCount} menu yang menggunakan kategori ini. Ubah kategori menu tersebut terlebih dahulu.");
+        }
+
+        $category->delete();
+        return back()->with('success_category', 'Kategori berhasil dihapus.');
+    }
+
     /**
      * Store a new promo or event.
      */
     public function storePromo(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'type' => 'required|string',
-            'start' => 'required|date',
-            'end' => 'required|date|after_or_equal:start',
-            'description' => 'nullable|string',
-            'menu_items' => 'nullable|array',
-            'menu_items.*' => 'integer|exists:menu_items,id',
-        ]);
+    'title' => 'required|string|max:255',
+    'start' => 'required|date',
+    'end' => 'required|date|after_or_equal:start',
+    'description' => 'nullable|string',
+    'menu_items' => 'nullable|array',
+    'menu_items.*' => 'integer|exists:menu_items,id',
+]);
+       $promo = Promo::create([
+    'title' => $validated['title'],
+    'type' => 'Promo',
+    'start_date' => $validated['start'],
+    'end_date' => $validated['end'],
+    'description' => $validated['description'] ?? '',
+    'status' => 'Aktif',
+]);
 
-        $promo = Promo::create([
-            'title' => $validated['title'],
-            'type' => $validated['type'],
-            'start_date' => $validated['start'],
-            'end_date' => $validated['end'],
-            'description' => $validated['description'] ?? '',
-            'status' => 'Aktif',
-        ]);
-
-        if ($validated['type'] !== 'Event / Live Music' && ! empty($validated['menu_items'])) {
-            $promo->menuItems()->sync($validated['menu_items']);
-        }
+        if (!empty($validated['menu_items']))
+{
+    $promo->menuItems()->sync($validated['menu_items']);
+}
 
         return back()->with('success_promo', 'Promo / Event berhasil dipublikasikan.');
     }

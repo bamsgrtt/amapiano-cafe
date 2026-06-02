@@ -26,6 +26,20 @@
         box-shadow: 0 8px 20px rgba(216, 130, 52, 0.4);
     }
 
+    .btn-primary-login {
+    background: transparent;
+    border: 2px solid #d88234;
+    color: #d88234;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-login:hover {
+    background: #d88234;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(216, 130, 52, 0.4);
+}
+
     .btn-secondary {
         background: linear-gradient(135deg, #166534 0%, #15803d 100%);
         transition: all 0.3s ease;
@@ -67,17 +81,17 @@
             <!-- Navigation Links - Desktop -->
             <div class="hidden md:flex items-center justify-end flex-1">
                 <div class="flex items-center">
-                    <a href="#beranda" class="nav-link text-white/90 hover:text-white transition-colors text-sm font-medium whitespace-nowrap block mr-6" id="nav-home">Beranda</a>
-                    <a href="#tentang" class="nav-link text-white/90 hover:text-white transition-colors text-sm font-medium whitespace-nowrap block mr-6" id="nav-about">Tentang</a>
-                    <a href="#galeri" class="nav-link text-white/90 hover:text-white transition-colors text-sm font-medium whitespace-nowrap block mr-6" id="nav-gallery">Galeri</a>
-                    <a href="#lokasi" class="nav-link text-white/90 hover:text-white transition-colors text-sm font-medium whitespace-nowrap block mr-6" id="nav-location">Kontak</a>
+                    <a href="#beranda" class="nav-link text-white/90 text-sm font-medium whitespace-nowrap block mr-6" id="nav-home">Beranda</a>
+                    <a href="#tentang" class="nav-link text-white/90 text-sm font-medium whitespace-nowrap block mr-6" id="nav-about">Tentang</a>
+                    <a href="#galeri" class="nav-link text-white/90 text-sm font-medium whitespace-nowrap block mr-6" id="nav-gallery">Galeri</a>
+                    <a href="#lokasi" class="nav-link text-white/90 text-sm font-medium whitespace-nowrap block mr-6" id="nav-location">Kontak</a>
                 </div>
 
                 <div class="flex items-center">
                     <a href="{{ Route::has('reservation') ? route('reservation') : '/reservation' }}" class="btn-primary text-white px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap block mr-4 transition-transform hover:-translate-y-0.5" id="nav-reserve-btn">
                         Reservasi Sekarang
                     </a>
-                    <a href="{{ Route::has('login') ? route('login') : '/login' }}" class="btn-primary text-white px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap block mr-4 transition-transform hover:-translate-y-0.5" id="nav-reserve-btn">
+                    <a href="{{ Route::has('login') ? route('login') : '/login' }}" class="btn-primary-login text-white px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap block mr-4 transition-transform hover:-translate-y-0.5" id="nav-reserve-btn">
                         Login
                     </a>
                 </div>

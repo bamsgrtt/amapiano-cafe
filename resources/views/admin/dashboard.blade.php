@@ -316,7 +316,7 @@
                     </div>
                 </div>
 
-                <!-- MENU & PROMO TAB -->
+                                <!-- MENU & PROMO TAB -->
                 <div id="tab-menu-promo" class="tab-content hidden fade-in space-y-6">
                     @if(session('success_menu'))
                         <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
@@ -328,13 +328,52 @@
                             {{ session('success_promo') }}
                         </div>
                     @endif
+                    @if(session('success_category'))
+                        <div class="p-4 mb-4 text-sm text-green-700 bg-green-100 rounded-lg">
+                            {{ session('success_category') }}
+                        </div>
+                    @endif
+
+                    <!-- Kategori Section -->
+                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                        <div class="flex items-center justify-between mb-6">
+                            <div>
+                                <h3 class="font-display text-lg font-bold text-gray-900">Kelola Kategori Menu</h3>
+                                <p class="text-sm text-gray-500">Tambahkan atau hapus kategori untuk mengelompokkan menu agar lebih rapi.</p>
+                            </div>
+                            <button onclick="openModal('modal-add-category')" class="bg-forest-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-forest-600 transition-all flex items-center shadow-md">
+                                <i class="fas fa-plus mr-2"></i> Tambah Kategori
+                            </button>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-3">
+                            @forelse($categories ?? [] as $category)
+                                <div class="flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 group hover:shadow-md hover:border-amapiano-300 transition-all">
+                                    <i class="fas fa-tag text-amapiano-500 mr-2 text-sm"></i>
+                                    <span class="font-semibold text-gray-800 mr-3">{{ $category->name }}</span>
+                                    <form action="{{ route('admin.categories.delete', $category->id) }}" method="POST" onsubmit="return confirm('Hapus kategori ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Hapus Kategori">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            @empty
+                                <div class="w-full py-4 text-center border-2 border-dashed border-gray-200 rounded-xl">
+                                    <p class="text-sm text-gray-500">Belum ada kategori. Klik tombol di atas untuk menambahkan.</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
 
                     <div class="grid lg:grid-cols-2 gap-6">
+                        <!-- Kelola Menu -->
                         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <div class="flex items-center justify-between mb-6">
                                 <div>
                                     <h3 class="font-display text-lg font-bold text-gray-900">Kelola Menu</h3>
-                                    <p class="text-sm text-gray-500">Tambahkan, edit, atau hapus daftar menu yang akan ditampilkan di halaman menu.</p>
+                                    <p class="text-sm text-gray-500">Tambahkan, edit, atau hapus daftar menu yang akan ditampilkan.</p>
                                 </div>
                                 <button onclick="openMenuModal()" class="bg-amapiano-500 text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-amapiano-600 transition-all flex items-center shadow-md">
                                     <i class="fas fa-plus mr-2"></i> Tambah Menu
@@ -366,12 +405,13 @@
                                     </div>
                                 @empty
                                     <div class="col-span-2 p-6 rounded-2xl border border-dashed border-gray-200 text-center text-gray-500">
-                                        Belum ada item menu. Tambahkan menu baru untuk ditampilkan di halaman Menu.
+                                        Belum ada item menu. Tambahkan menu baru untuk ditampilkan.
                                     </div>
                                 @endforelse
                             </div>
                         </div>
 
+                        <!-- Kelola Promo -->
                         <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                             <div class="flex items-center justify-between mb-6">
                                 <div>
@@ -775,14 +815,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Judul Promo</label>
                     <input type="text" name="title" id="promo-title" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" placeholder="Contoh: Weekend Special">
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Tipe</label>
-                    <select name="type" id="promo-type" required onchange="togglePromoMenuItems()" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
-                        <option value="Diskon">Diskon</option>
-                        <option value="Event / Live Music">Event / Live Music</option>
-                        <option value="Buy 1 Get 1">Buy 1 Get 1</option>
-                    </select>
-                </div>
+                
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">Mulai</label>
@@ -793,13 +826,7 @@
                         <input type="date" name="end" id="promo-end" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                    <select name="status" id="promo-status" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none">
-                        <option value="Aktif">Aktif</option>
-                        <option value="Tidak Aktif">Tidak Aktif</option>
-                    </select>
-                </div>
+                
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi</label>
                     <textarea name="description" id="promo-description" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" rows="3" placeholder="Deskripsi..."></textarea>
@@ -848,10 +875,17 @@
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
                     <select name="category" id="menu-category" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amapiano-500 outline-none">
-                        <option value="Western">Western</option>
-                        <option value="Nusantara">Nusantara</option>
-                        <option value="Drinks">Drinks</option>
-                        <option value="Desserts">Desserts</option>
+                        @if(isset($categories) && count($categories) > 0)
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->name }}">{{ $cat->name }}</option>
+                            @endforeach
+                        @else
+                            <!-- Fallback jika data kategori belum ada di controller -->
+                            <option value="Western">Western</option>
+                            <option value="Nusantara">Nusantara</option>
+                            <option value="Drinks">Drinks</option>
+                            <option value="Desserts">Desserts</option>
+                        @endif
                     </select>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -873,7 +907,24 @@
         </div>
     </div>
 
-
+    <!-- Modal Add Category -->
+    <div id="modal-add-category" class="modal opacity-0 pointer-events-none fixed inset-0 z-50 flex items-center justify-center">
+        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm" onclick="closeModal('modal-add-category')"></div>
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md relative z-10 transform scale-95 transition-transform duration-200 p-6 m-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-display text-lg font-bold text-gray-900">Tambah Kategori Baru</h3>
+                <button onclick="closeModal('modal-add-category')" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-lg"></i></button>
+            </div>
+            <form action="{{ route('admin.categories.store') }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Kategori</label>
+                    <input type="text" name="name" required class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-forest-500 outline-none" placeholder="Contoh: Makanan Berat, Minuman, Snack">
+                </div>
+                <button type="submit" class="w-full bg-forest-500 text-white py-3 rounded-xl font-bold hover:bg-forest-600 transition-colors">Simpan Kategori</button>
+            </form>
+        </div>
+    </div>
     <script>
         // Tab Switching Logic
         function switchTab(tabId) {
@@ -936,19 +987,24 @@
             document.body.classList.remove('modal-active');
         }
 
-        function resetMenuForm() {
+                function resetMenuForm() {
             document.getElementById('menu-modal-title').textContent = 'Tambah Menu Item';
             document.getElementById('menu-form').action = '{{ route('admin.menu-items.store') }}';
             document.getElementById('menu-form-method').value = 'POST';
             document.getElementById('menu-item-id').value = '';
             document.getElementById('menu-name').value = '';
-            document.getElementById('menu-category').value = 'Western';
+            
+            // Reset kategori ke pilihan pertama yang tersedia secara dinamis
+            const catSelect = document.getElementById('menu-category');
+            if (catSelect && catSelect.options.length > 0) {
+                catSelect.selectedIndex = 0;
+            }
+            
             document.getElementById('menu-price').value = '';
             document.getElementById('menu-description').value = '';
             document.getElementById('menu-photo').value = '';
             document.getElementById('menu-submit-button').textContent = 'Simpan Menu';
         }
-
         function openMenuModal(item = null) {
             resetMenuForm();
 
@@ -971,20 +1027,23 @@
             document.body.classList.add('modal-active');
         }
 
-        function resetPromoForm() {
+                function resetPromoForm() {
             document.getElementById('promo-modal-title').textContent = 'Tambah Promo';
             document.getElementById('promo-form').action = '{{ route('admin.promos.store') }}';
             document.getElementById('promo-form-method').value = 'POST';
             document.getElementById('promo-id').value = '';
             document.getElementById('promo-title').value = '';
-            document.getElementById('promo-type').value = 'Diskon';
             document.getElementById('promo-start').value = '';
             document.getElementById('promo-end').value = '';
-            document.getElementById('promo-status').value = 'Aktif';
             document.getElementById('promo-description').value = '';
             document.querySelectorAll('.menu-item-checkbox').forEach(cb => cb.checked = false);
             document.getElementById('promo-submit-button').textContent = 'Publikasikan Promo';
-            togglePromoMenuItems();
+            
+            // Pastikan bagian pilih menu selalu terlihat (karena logika 'tipe' sudah dihapus)
+            const menuSection = document.getElementById('promo-menu-items-section');
+            if (menuSection) {
+                menuSection.classList.remove('hidden');
+            }
         }
 
         function togglePromoMenuItems() {
@@ -1007,24 +1066,21 @@
                 document.getElementById('promo-form-method').value = 'PUT';
                 document.getElementById('promo-id').value = promo.id;
                 document.getElementById('promo-title').value = promo.title;
-                document.getElementById('promo-type').value = promo.type;
                 document.getElementById('promo-start').value = promo.start_date ?? promo.start;
                 document.getElementById('promo-end').value = promo.end_date ?? promo.end;
-                document.getElementById('promo-status').value = promo.status ?? 'Aktif';
                 document.getElementById('promo-description').value = promo.description;
                 document.getElementById('promo-submit-button').textContent = 'Perbarui Promo';
                 
-                // Load associated menu items if promo has them
+                // Centang menu yang terkait jika sedang mode edit
                 if (promo.menu_items && promo.menu_items.length > 0) {
                     promo.menu_items.forEach(item => {
                         const checkbox = document.querySelector(`input[value="${item.id}"]`);
                         if (checkbox) checkbox.checked = true;
                     });
                 }
-                
-                togglePromoMenuItems();
             }
 
+            // Tampilkan Modal
             const modal = document.getElementById('modal-add-promo');
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.querySelector('div.relative').classList.remove('scale-95');
@@ -1087,4 +1143,3 @@
         });
     </script>
 </x-layouts.dashboard>
-
