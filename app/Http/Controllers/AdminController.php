@@ -206,12 +206,12 @@ class AdminController extends Controller
     }
 
     /**
-     * Delete a date-based operational rule.
+     * Delete date-based operational rules.
      */
     public function deleteOperationalDate($id): RedirectResponse
     {
-        $schedule = StoreOperationalDate::findOrFail($id);
-        $schedule->delete();
+        $idArray = explode(',', $id);
+        StoreOperationalDate::whereIn('id', $idArray)->delete();
 
         return back()->with('success_store_schedule', 'Jadwal operasional berhasil dihapus.');
     }

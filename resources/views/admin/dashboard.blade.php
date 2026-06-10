@@ -653,13 +653,13 @@
                                         <label class="block text-sm font-semibold text-gray-700">
                                             <i class="fas fa-calendar-alt text-red-400 mr-2"></i>Tanggal Mulai
                                         </label>
-                                        <input type="date" name="start_date" class="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
+                                        <input type="date" onclick="this.showPicker()" onkeypress="return false;" name="start_date" class="w-full px-4 py-3.5 border-2 cursor-pointer border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
                                     </div>
                                     <div class="space-y-3">
                                         <label class="block text-sm font-semibold text-gray-700">
                                             <i class="fas fa-calendar-check text-red-400 mr-2"></i>Tanggal Selesai
                                         </label>
-                                        <input type="date" name="end_date" class="w-full px-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
+                                        <input type="date" onclick="this.showPicker()" onkeypress="return false;" name="end_date" class="w-full px-4 py-3.5 border-2 cursor-pointer border-gray-200 rounded-xl focus:ring-4 focus:ring-red-100 focus:border-red-500 outline-none transition-all text-gray-700 font-medium" min="{{ now()->toDateString() }}" required>
                                     </div>
                                 </div>
                                 <div class="flex justify-end pt-2">
@@ -708,33 +708,37 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-gray-100">
-                                    @forelse($storeOperationalDates as $schedule)
+                                    @forelse(App\Models\StoreOperationalDate::groupAndFormatRanges($storeOperationalDates) as $range)
                                         <tr class="hover:bg-gray-50 transition-colors group">
                                             <td class="px-6 py-5">
                                                 <div class="flex items-center gap-3">
                                                     <div class="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center group-hover:bg-gray-200 transition-colors">
                                                         <i class="fas fa-calendar-day text-gray-500"></i>
                                                     </div>
-                                                    <div>
-                                                        <p class="font-semibold text-gray-900">{{ $schedule->date->translatedFormat('d M Y') }}</p>
-                                                        <p class="text-xs text-gray-500 mt-0.5">{{ $schedule->date->diffForHumans() }}</p>
-                                                    </div>
+                                                    <span class="font-semibold text-gray-900">{{ $range->date_label }}</span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-5">
-                                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl {{ $schedule->is_open ? 'bg-forest-50 text-forest-700 border border-forest-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
-                                                    <div class="w-2 h-2 rounded-full {{ $schedule->is_open ? 'bg-forest-500' : 'bg-red-500' }} animate-pulse"></div>
-                                                    <span class="text-sm font-bold">{{ $schedule->status_label }}</span>
+                                                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-xl {{ $range->is_open ? 'bg-forest-50 text-forest-700 border border-forest-200' : 'bg-red-50 text-red-700 border border-red-200' }}">
+                                                    <div class="w-2 h-2 rounded-full {{ $range->is_open ? 'bg-forest-500' : 'bg-red-500' }} animate-pulse"></div>
+                                                    <span class="text-sm font-bold">{{ $range->status_label }}</span>
                                                 </div>
                                             </td>
                                             <td class="px-6 py-5 text-right">
-                                                <form action="{{ route('admin.store.schedule.delete', $schedule->id) }}" method="POST" onsubmit="return confirm('Hapus jadwal operasional tanggal ini?')" class="inline">
+                                                <form action="{{ route('admin.store.schedule.delete', $range->ids_string) }}" method="POST" onsubmit="return confirm('Buka kembali cafe pada tanggal/rentang ini?')" class="inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-xl text-sm font-semibold hover:bg-red-100 hover:text-red-700 transition-all group/delete">
-                                                        <i class="fas fa-trash-alt group-hover/delete:scale-110 transition-transform"></i>
-                                                        <span>Hapus</span>
-                                                    </button>
+                                                    @if(!$range->is_open)
+                                                        <button type="submit" class="group/actionBtn inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-50 text-emerald-700 border border-emerald-200/60 hover:bg-emerald-500 hover:text-white hover:border-emerald-500 hover:shadow-[0_4px_12px_rgba(16,185,129,0.2)] active:scale-95 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer shadow-sm">
+                                                            <i class="fas fa-door-open text-xs transition-transform group-hover/actionBtn:scale-110 group-hover/actionBtn:rotate-3"></i>
+                                                            <span>Buka Cafe</span>
+                                                        </button>
+                                                    @else
+                                                        <button type="submit" class="group/actionBtn inline-flex items-center gap-2 px-4 py-2.5 bg-rose-50 text-rose-700 border border-rose-200/60 hover:bg-rose-500 hover:text-white hover:border-rose-500 hover:shadow-[0_4px_12px_rgba(244,63,94,0.2)] active:scale-95 rounded-xl text-sm font-bold transition-all duration-300 cursor-pointer shadow-sm">
+                                                            <i class="fas fa-trash text-xs transition-transform group-hover/actionBtn:scale-110 group-hover/actionBtn:rotate-12"></i>
+                                                            <span>Hapus</span>
+                                                        </button>
+                                                    @endif
                                                 </form>
                                             </td>
                                         </tr>
@@ -925,6 +929,35 @@
             </form>
         </div>
     </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="modal-custom-confirm" class="modal opacity-0 pointer-events-none fixed inset-0 z-[100] flex items-center justify-center transition-all duration-300">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300" onclick="closeConfirmModal()"></div>
+        <!-- Modal Card -->
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-sm relative z-10 transform scale-95 transition-all duration-300 p-8 m-4 border border-gray-100">
+            <!-- Icon -->
+            <div class="w-20 h-20 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center mx-auto mb-6 border-4 border-orange-100/50 transition-transform duration-500 scale-75" id="confirm-modal-icon-container">
+                <i class="fas fa-exclamation-triangle text-3xl" id="confirm-modal-icon"></i>
+            </div>
+            
+            <!-- Content -->
+            <div class="text-center mb-8">
+                <h3 class="font-display text-xl font-extrabold text-gray-900 tracking-tight" id="confirm-modal-title">Konfirmasi Tindakan</h3>
+                <p class="text-sm text-gray-500 leading-relaxed mt-3 px-2" id="confirm-modal-message">Apakah Anda yakin ingin melakukan tindakan ini?</p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="flex gap-3">
+                <button type="button" onclick="closeConfirmModal()" class="flex-1 px-5 py-3.5 border-2 border-gray-100 text-gray-500 rounded-xl font-bold hover:bg-gray-50 hover:text-gray-700 hover:border-gray-200 transition-all text-sm active:scale-95 duration-200 cursor-pointer">
+                    Batal
+                </button>
+                <button type="button" id="confirm-modal-submit" class="flex-1 px-5 py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl font-bold transition-all text-sm active:scale-95 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 duration-200 cursor-pointer">
+                    Konfirmasi
+                </button>
+            </div>
+        </div>
+    </div>
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -961,6 +994,16 @@
             // Mobile close sidebar
             if(window.innerWidth < 768) {
                 document.getElementById('sidebar').classList.add('hidden');
+            }
+
+            // Update URL search parameter and localStorage
+            try {
+                const url = new URL(window.location);
+                url.searchParams.set('tab', tabId);
+                window.history.replaceState({}, '', url);
+                localStorage.setItem('adminActiveTab', tabId);
+            } catch (e) {
+                console.error('Error updating tab history:', e);
             }
         }
 
@@ -1090,14 +1133,207 @@
             document.body.classList.add('modal-active');
         }
 
+        // Custom Confirm Modal Logic
+        let confirmCallback = null;
+
+        function showCustomConfirm(message, callback) {
+            confirmCallback = callback;
+            
+            const modal = document.getElementById('modal-custom-confirm');
+            const titleEl = document.getElementById('confirm-modal-title');
+            const msgEl = document.getElementById('confirm-modal-message');
+            const iconContainer = document.getElementById('confirm-modal-icon-container');
+            const iconEl = document.getElementById('confirm-modal-icon');
+            const submitBtn = document.getElementById('confirm-modal-submit');
+            
+            msgEl.textContent = message;
+            
+            let theme = 'orange';
+            let iconClass = 'fas fa-exclamation-triangle';
+            let titleText = 'Konfirmasi';
+            let buttonText = 'Konfirmasi';
+            
+            const lowerMsg = message.toLowerCase();
+            
+            if (lowerMsg.includes('buka kembali cafe') || lowerMsg.includes('buka cafe')) {
+                theme = 'emerald';
+                iconClass = 'fas fa-door-open';
+                titleText = 'Buka Kembali Cafe?';
+                buttonText = 'Buka Cafe';
+            } else if (lowerMsg.includes('hapus') || lowerMsg.includes('batal') || lowerMsg.includes('delete')) {
+                theme = 'rose';
+                iconClass = 'fas fa-trash-alt';
+                titleText = 'Konfirmasi Hapus';
+                buttonText = 'Hapus';
+            }
+            
+            // Reset and apply theme styles
+            iconContainer.className = 'w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 border-4 transition-all duration-500 scale-75';
+            iconEl.className = `${iconClass} text-3xl`;
+            
+            if (theme === 'emerald') {
+                iconContainer.classList.add('bg-emerald-50', 'text-emerald-500', 'border-emerald-100/50');
+                submitBtn.className = 'flex-1 px-5 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-bold transition-all text-sm active:scale-95 shadow-md shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 duration-200 cursor-pointer';
+            } else if (theme === 'rose') {
+                iconContainer.classList.add('bg-rose-50', 'text-rose-500', 'border-rose-100/50');
+                submitBtn.className = 'flex-1 px-5 py-3.5 bg-gradient-to-r from-rose-500 to-red-500 hover:from-rose-600 hover:to-red-600 text-white rounded-xl font-bold transition-all text-sm active:scale-95 shadow-md shadow-rose-500/20 hover:shadow-lg hover:shadow-rose-500/30 duration-200 cursor-pointer';
+            } else {
+                iconContainer.classList.add('bg-orange-50', 'text-orange-500', 'border-orange-100/50');
+                submitBtn.className = 'flex-1 px-5 py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white rounded-xl font-bold transition-all text-sm active:scale-95 shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 duration-200 cursor-pointer';
+            }
+            
+            titleEl.textContent = titleText;
+            submitBtn.textContent = buttonText;
+            
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+            
+            const card = modal.querySelector('div.relative');
+            card.classList.remove('scale-95');
+            card.classList.add('scale-100');
+            
+            setTimeout(() => {
+                iconContainer.classList.remove('scale-75');
+                iconContainer.classList.add('scale-100');
+            }, 50);
+            
+            document.body.classList.add('modal-active');
+        }
+
+        function closeConfirmModal() {
+            const modal = document.getElementById('modal-custom-confirm');
+            const card = modal.querySelector('div.relative');
+            const iconContainer = document.getElementById('confirm-modal-icon-container');
+            
+            modal.classList.add('opacity-0', 'pointer-events-none');
+            card.classList.add('scale-95');
+            card.classList.remove('scale-100');
+            if (iconContainer) {
+                iconContainer.classList.remove('scale-100');
+                iconContainer.classList.add('scale-75');
+            }
+            
+            document.body.classList.remove('modal-active');
+            confirmCallback = null;
+        }
+
+        function convertNativeConfirms() {
+            document.querySelectorAll('form[onsubmit*="confirm("]').forEach(form => {
+                const onsubmitAttr = form.getAttribute('onsubmit');
+                const match = onsubmitAttr.match(/confirm\(['"](.+?)['"]\)/);
+                if (match) {
+                    const message = match[1];
+                    form.removeAttribute('onsubmit');
+                    form.dataset.confirmMessage = message;
+                }
+            });
+        }
+
+        // Global submit interceptor for custom confirms
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.dataset.confirmMessage && form.dataset.confirmed !== 'true') {
+                e.preventDefault();
+                e.stopPropagation();
+                showCustomConfirm(form.dataset.confirmMessage, function() {
+                    form.dataset.confirmed = 'true';
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                    } else {
+                        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    }
+                });
+            }
+        },true);
+
+        // Initialize custom confirm elements
+        document.addEventListener('DOMContentLoaded', function() {
+            convertNativeConfirms();
+            
+            const submitConfirmBtn = document.getElementById('confirm-modal-submit');
+            if (submitConfirmBtn) {
+                submitConfirmBtn.addEventListener('click', function() {
+                    if (confirmCallback) {
+                        confirmCallback();
+                    }
+                    closeConfirmModal();
+                });
+            }
+        });
 
         // Initialize Chart with dynamic database values
         document.addEventListener('DOMContentLoaded', function() {
             // Keep tab open if active
             const urlParams = new URLSearchParams(window.location.search);
-            const activeTab = urlParams.get('tab');
+            let activeTab = urlParams.get('tab');
+            if (!activeTab) {
+                try {
+                    activeTab = localStorage.getItem('adminActiveTab');
+                } catch (e) {
+                    console.error('Error reading active tab from localStorage:', e);
+                }
+            }
             if (activeTab) {
                 switchTab(activeTab);
+            }
+
+            // AJAX Form Handling for Store Status Tab
+            const storeStatusTab = document.getElementById('tab-store-status');
+            if (storeStatusTab) {
+                storeStatusTab.addEventListener('submit', function(e) {
+                    const form = e.target;
+                    
+                    const isAddForm = form.action.includes('/admin/store/schedule') && !form.action.match(/\/schedule\/[0-9]+/);
+                    const isDeleteForm = form.action.includes('/admin/store/schedule/');
+                    
+                    if (!isAddForm && !isDeleteForm) {
+                        return;
+                    }
+                    
+                    e.preventDefault();
+                    
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
+                    
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner animate-spin mr-2"></i> Memproses...';
+                    }
+                    
+                    const formData = new FormData(form);
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Terjadi kesalahan pada server.');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        
+                        const oldContent = document.getElementById('tab-store-status');
+                        const newContent = doc.getElementById('tab-store-status');
+                        
+                        if (oldContent && newContent) {
+                            oldContent.innerHTML = newContent.innerHTML;
+                            convertNativeConfirms();
+                        }
+                    })
+                    .catch(error => {
+                        alert(error.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnHtml;
+                        }
+                    });
+                });
             }
 
             const ctx = document.getElementById('reservationChart').getContext('2d');
