@@ -102,95 +102,7 @@
 
 <div id="booking-section" class="py-12 bg-gray-50/50">
     <!-- Success / Ticket Modal -->
-    <div id="success-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4" style="background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);">
-        <div class="bg-white rounded-3xl max-w-md w-full animate-slide-in-scale shadow-2xl overflow-hidden" style="max-height: 90vh; overflow-y: auto;">
-            
-            <!-- Success Header -->
-            <div class="bg-gradient-to-r from-green-500 to-green-600 p-6 text-center relative">
-                <button onclick="closeModal()" class="absolute top-4 right-4 text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-all focus:outline-none" aria-label="Close modal">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-                <h3 class="font-display text-2xl font-bold text-white">Reservasi Berhasil! 🎉</h3>
-                <p class="text-green-100 text-sm mt-1">Meja Anda telah berhasil dipesan</p>
-            </div>
-            
-            <!-- Booking Ticket -->
-            <div class="p-6">
-                <div id="reservation-ticket" class="ticket-border rounded-xl p-5 bg-amber-50 relative">
-                    <!-- Ticket Punch Holes (Left & Right) -->
-                    <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-10"></div>
-                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-10"></div>
-                    <div class="text-center mb-4">
-                        <p class="text-xs text-gray-500 uppercase tracking-widest">Booking Code</p>
-                        <p class="font-display text-3xl font-bold shimmer-text" id="ticket-booking-code">#AMP-000</p>
-                    </div>
-                    
-                    <div class="space-y-2 text-sm mb-4">
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Ruangan</span>
-                            <span class="font-bold text-gray-900" id="ticket-room">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Meja</span>
-                            <span class="font-bold text-gray-900" id="ticket-table">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Tanggal</span>
-                            <span class="font-bold text-gray-900" id="ticket-date">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Waktu</span>
-                            <span class="font-bold text-gray-900" id="ticket-time">-</span>
-                        </div>
-                        <div class="flex justify-between py-1 border-b border-amber-200">
-                            <span class="text-gray-500">Nama</span>
-                            <span class="font-bold text-gray-900" id="ticket-name">-</span>
-                        </div>
-                        <div class="flex justify-between py-1">
-                            <span class="text-gray-500">No. HP</span>
-                            <span class="font-bold text-gray-900" id="ticket-phone">-</span>
-                        </div>
-                    </div>
-                    
-                    <!-- QR Code -->
-                    <div class="text-center">
-                        <p class="text-xs text-gray-500 mb-2">Scan QR Code untuk verifikasi</p>
-                        <div class="inline-block bg-white p-3 rounded-xl shadow-md">
-                            <img alt="QR Code" id="qr-code" class="w-32 h-32">
-                        </div>
-                    </div>
-                </div>
-                
-
-                
-                <!-- Rules Reminder -->
-                <div class="mt-4 bg-blue-50 border border-blue-200 rounded-xl p-3">
-                    <p class="text-blue-800 text-xs font-semibold mb-1"> Pengingat:</p>
-                    <ul class="text-blue-700 text-xs space-y-0.5">
-                        <li>• Datang sesuai waktu reservasi</li>
-                        <li>• Tunjukkan booking code saat arrival</li>
-                        <li>• Min. order Rp 40.000 (weekday) / Rp 60.000 (weekend)</li>
-                        <li>• Menu dipesan via QR di meja</li>
-                    </ul>
-                </div>
-                
-                <div class="flex gap-3 mt-4">
-                    <button id="btn-download" onclick="downloadTicket()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-md">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                        <span>Unduh Struk</span>
-                    </button>
-                    <button onclick="resetAll()" class="flex-1 btn-primary text-white py-3 rounded-xl font-semibold text-sm shadow-md">
-                        Reservasi Baru
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
+    
 
     <div class="max-w-4xl mx-auto px-4 py-6 md:py-10">
         
@@ -273,6 +185,19 @@
                         <span id="step-num-4">4</span>
                     </div>
                     <p id="step-text-4" class="text-xs font-medium mt-1.5 text-gray-400">Data Pemesan</p>
+                </div>
+                
+                <!-- Line -->
+                <div class="flex-1 mx-2 mb-6">
+                    <div id="line-4" class="h-1 rounded-full bg-gray-200 progress-line"></div>
+                </div>
+                
+                <!-- Step 5 -->
+                <div class="flex flex-col items-center">
+                    <div id="step-circle-5" class="step-circle w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs border-2 bg-gray-100 border-gray-300 text-gray-400">
+                        <span id="step-num-5">5</span>
+                    </div>
+                    <p id="step-text-5" class="text-xs font-medium mt-1.5 text-gray-400">Selesai</p>
                 </div>
             </div>
         </div>
@@ -363,7 +288,7 @@
                     <!-- Hoof Barn -->
                     <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('hoof-barn')" id="room-hoof-barn">
                         <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/153a6de12-232b-4ec6-b928-ef5b7417ff4c.png" alt="Hoof Barn" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/reservasi dan no wa.png') }}" alt="Hoof Barn" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute bottom-2 left-2 right-2">
                                 <span class="bg-amber-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🏠 Rustic</span>
@@ -387,7 +312,7 @@
                     <!-- Covent Garden -->
                     <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('covent-garden')" id="room-covent-garden">
                         <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/13e6bc120-4d2e-41ae-bdad-8058b9dbe46d.png" alt="Covent Garden" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/cg.png') }}" alt="Covent Garden" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute bottom-2 left-2 right-2">
                                 <span class="bg-green-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🌿 Outdoor</span>
@@ -411,7 +336,7 @@
                     <!-- Limburg -->
                     <div class="room-card rounded-xl border-2 border-gray-200 overflow-hidden cursor-pointer" onclick="selectRoom('limburg')" id="room-limburg">
                         <div class="relative h-36 overflow-hidden">
-                            <img src="https://image.qwenlm.ai/public_source/6e2c476c-f0b3-4d3c-8a38-95751c492c3e/14fc7fd8c-30bc-4e73-a2e3-54c53769e1cb.png" alt="Limburg" class="w-full h-full object-cover">
+                            <img src="{{ asset('images/limb.png') }}" alt="Limburg" class="w-full h-full object-cover">
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute bottom-2 left-2 right-2">
                                 <span class="bg-purple-500/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">🏛️ Indoor</span>
@@ -570,6 +495,90 @@
                     ✓ Konfirmasi Reservasi
                 </button>
             </div>
+        </div>
+
+        <!-- ============ STEP 5: Selesai (Tiket) ============ -->
+        <div id="content-step-5" class="step-content hidden">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <!-- Success Header -->
+                <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-center relative mb-6">
+                    <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-display text-2xl font-bold text-white">Reservasi Berhasil! 🎉</h3>
+                    <p class="text-green-100 text-sm mt-1">Meja Anda telah berhasil dipesan</p>
+                </div>
+                
+                <!-- Booking Ticket -->
+                <div id="reservation-ticket" class="ticket-border rounded-xl p-5 bg-amber-50 relative mb-4">
+                    <!-- Ticket Punch Holes (Left & Right) -->
+                    <div class="absolute -left-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-10"></div>
+                    <div class="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full z-10"></div>
+                    <div class="text-center mb-4">
+                        <p class="text-xs text-gray-500 uppercase tracking-widest">Booking Code</p>
+                        <p class="font-display text-3xl font-bold shimmer-text" id="ticket-booking-code">#AMP-000</p>
+                    </div>
+                    
+                    <div class="space-y-2 text-sm mb-4">
+                        <div class="flex justify-between py-1 border-b border-amber-200">
+                            <span class="text-gray-500">Ruangan</span>
+                            <span class="font-bold text-gray-900" id="ticket-room">-</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-amber-200">
+                            <span class="text-gray-500">Meja</span>
+                            <span class="font-bold text-gray-900" id="ticket-table">-</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-amber-200">
+                            <span class="text-gray-500">Tanggal</span>
+                            <span class="font-bold text-gray-900" id="ticket-date">-</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-amber-200">
+                            <span class="text-gray-500">Waktu</span>
+                            <span class="font-bold text-gray-900" id="ticket-time">-</span>
+                        </div>
+                        <div class="flex justify-between py-1 border-b border-amber-200">
+                            <span class="text-gray-500">Nama</span>
+                            <span class="font-bold text-gray-900" id="ticket-name">-</span>
+                        </div>
+                        <div class="flex justify-between py-1">
+                            <span class="text-gray-500">No. HP</span>
+                            <span class="font-bold text-gray-900" id="ticket-phone">-</span>
+                        </div>
+                    </div>
+                    
+                    <!-- QR Code -->
+                    <div class="text-center">
+                        <p class="text-xs text-gray-500 mb-2">Scan QR Code untuk verifikasi</p>
+                        <div class="inline-block bg-white p-3 rounded-xl shadow-md">
+                            <img alt="QR Code" id="qr-code" class="w-32 h-32">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rules Reminder -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4">
+                    <p class="text-blue-800 text-xs font-semibold mb-1">Pengingat:</p>
+                    <ul class="text-blue-700 text-xs space-y-0.5">
+                        <li>• Datang sesuai waktu reservasi</li>
+                        <li>• Tunjukkan booking code saat arrival</li>
+                        <li>• Min. order Rp 40.000 (weekday) / Rp 60.000 (weekend)</li>
+                        <li>• Menu dipesan via QR di meja</li>
+                    </ul>
+                </div>
+                
+                <div class="flex gap-3">
+                    <button id="btn-download" onclick="downloadTicket()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-xl font-semibold text-sm flex items-center justify-center space-x-2 transition-all shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                        <span>Unduh Struk</span>
+                    </button>
+                    <button onclick="resetAll()" class="flex-1 btn-primary text-white py-3 rounded-xl font-semibold text-sm shadow-md">
+                        Reservasi Baru
+                    </button>
+                </div>
+            </div>
+        </div>
         @endif
     </div>
 
@@ -746,13 +755,16 @@
             
             if (step === 3) renderFloorPlan();
             if (step === 4) updateSummary();
+            if (step === 5) {
+                // Step 5 doesn't need special handling - just scroll
+            }
             
             currentStep = step;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
         function updateStepIndicators(step) {
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= 5; i++) {
                 const circle = document.getElementById('step-circle-' + i);
                 const num = document.getElementById('step-num-' + i);
                 const text = document.getElementById('step-text-' + i);
@@ -774,7 +786,7 @@
                 }
             }
             
-            for (let i = 1; i <= 3; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const line = document.getElementById('line-' + i);
                 line.className = 'h-1 rounded-full progress-line ' + (step > i ? 'bg-green-500' : 'bg-gray-200');
             }
@@ -1030,8 +1042,8 @@
                     // Set QR Code source using the backend-generated base64 SVG
                     document.getElementById('qr-code').src = 'data:image/svg+xml;base64,' + data.reservation.qr_code;
                     
-                    // Show modal
-                    document.getElementById('success-modal').classList.remove('hidden');
+                    // Navigate to step 5 instead of showing modal
+                    goToStep(5);
                     createConfetti();
                 } else {
                     alert('Gagal membuat reservasi: ' + (data.message || 'Terjadi kesalahan'));

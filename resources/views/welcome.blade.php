@@ -620,7 +620,7 @@
     <!-- CTA Section -->
     <section class="py-20 relative overflow-hidden">
         <div class="absolute inset-0">
-            <img src="{{ asset('images/g6.png') }}" alt="Amapiano Sunset" class="w-full h-full object-cover">
+            <img src="{{ asset('images/reservasi dan no wa.png') }}" alt="Amapiano Sunset" class="w-full h-full object-bottom">
             <div class="absolute inset-0 bg-amapiano-900/70"></div>
         </div>
         <div class="relative z-10 max-w-4xl mx-auto px-6 text-center reveal">

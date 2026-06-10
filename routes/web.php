@@ -63,14 +63,15 @@ Route::get('/reservation', function () {
 })->name('reservation');
 
 Route::get('/menu', function () {
-    $menuItems = MenuItem::with(['promos' => function ($query) {
-        $query->where('type', '!=', 'Event / Live Music')
-              ->where('status', 'Aktif');
-    }])->orderBy('category')->orderBy('name')->get();
+    // Ambil data paling dasar dulu untuk memastikan tidak ada error query
+    $categories = \App\Models\Category::orderBy('name', 'asc')->get();
+    $menuItems = \App\Models\MenuItem::orderBy('category')->orderBy('name')->get();
 
-    return view('menu', compact('menuItems'));
+    return view('menu', compact('categories', 'menuItems'));
 })->name('menu');
 
 Route::post('/reservations', [ReservationController::class, 'store'])->name('reservations.store');
 Route::get('/reservations/booked', [ReservationController::class, 'booked'])->name('reservations.booked');
 Route::get('/reservations/{code}/download', [ReservationController::class, 'download'])->name('reservations.download');
+Route::post('/admin/categories', [AdminController::class, 'storeCategory'])->name('admin.categories.store');
+Route::delete('/admin/categories/{id}', [AdminController::class, 'deleteCategory'])->name('admin.categories.delete');

@@ -10,12 +10,12 @@ class MenuItem extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'description',
-        'price',
-        'category',
-        'image_path',
-    ];
+    'name',
+    'description',
+    'price',
+    'category',
+    'image_path',
+];
 
     protected $casts = [
         'price' => 'integer',
@@ -23,11 +23,18 @@ class MenuItem extends Model
 
     public function getImageUrlAttribute(): string
     {
-        return $this->image_path ? asset('storage/'.$this->image_path) : asset('images/default-menu.png');
+        return $this->image_path
+            ? asset('storage/'.$this->image_path)
+            : asset('images/default-menu.png');
     }
 
     public function promos()
     {
         return $this->belongsToMany(Promo::class, 'menu_item_promo');
     }
+
+    // public function category()
+// {
+//     return $this->belongsTo(Category::class);
+// }
 }
