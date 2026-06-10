@@ -925,6 +925,8 @@
             </form>
         </div>
     </div>
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // Tab Switching Logic
         function switchTab(tabId) {
@@ -1142,4 +1144,5 @@
             });
         });
     </script>
+@endpush
 </x-layouts.dashboard>
